@@ -47,9 +47,11 @@ export default function AirplaneWritePage() {
         value={content}
         onChange={setContent}
         maxLength={200}
-        showCount
         style={{ marginBottom: '20px' }}
       />
+      <div style={{ textAlign: 'right', fontSize: '12px', color: '#999', marginBottom: '20px' }}>
+        {content.length}/200
+      </div>
 
       <Button color="primary" block onClick={handlePublish}>
         折成纸飞机
