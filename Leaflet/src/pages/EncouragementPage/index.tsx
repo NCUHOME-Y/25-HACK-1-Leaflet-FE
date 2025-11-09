@@ -1,8 +1,7 @@
 // src/pages/EncouragementPage/index.tsx
 import { useState, useMemo } from 'react';
-import { Button, Toast, Image, Space, Tag, TabBar } from 'antd-mobile';
+import { Button, Toast, Space, Tag, TabBar } from 'antd-mobile';
 import { useLocation, useNavigate } from 'react-router-dom';
-import starIcon from '../../assets/images/star-icon.png'; // 鼓励语图标
 // import { getTodayEncouragement } from '../../services/encouragement.service'; // 待实现
 
 export default function EncouragementPage() {
@@ -59,11 +58,9 @@ export default function EncouragementPage() {
                 }}
             >
                 <Space align="center" direction="vertical" style={{ width: '100%' }}>
-                    <Image
-                        src={starIcon}
-                        style={{ width: '48px', height: '48px' }}
-                        fit="contain"
-                    />
+                    <div style={{ width: 48, height: 48, lineHeight: '48px', fontSize: 32 }}>
+                        🌟
+                    </div>
                     <div>
                         <div style={{ fontWeight: 'bold', fontSize: '16px', color: '#00a878' }}>
                             今日鼓励语
