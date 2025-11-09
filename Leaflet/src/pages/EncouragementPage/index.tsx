@@ -15,7 +15,7 @@ export default function EncouragementPage() {
         if (location.pathname.startsWith('/tree')) return '/tree';
         if (location.pathname.startsWith('/record')) return '/record';
         if (location.pathname.startsWith('/encouragement')) return '/encouragement';
-        if (location.pathname.startsWith('/airplane/write')) return '/airplane/write';
+        if (location.pathname.startsWith('/my')) return '/my';
         return '/encouragement';
     }, [location.pathname]);
 
@@ -128,7 +128,7 @@ export default function EncouragementPage() {
                     <TabBar.Item key="/tree" icon={<span style={{ fontSize: 20 }}>🌳</span>} title="心情树" />
                     <TabBar.Item key="/record" icon={<span style={{ fontSize: 20 }}>📝</span>} title="心情记录" />
                     <TabBar.Item key="/encouragement" icon={<span style={{ fontSize: 20 }}>💬</span>} title="每日鼓励" />
-                    <TabBar.Item key="/airplane/write" icon={<span style={{ fontSize: 20 }}>🛩️</span>} title="放飞纸条" />
+                    <TabBar.Item key="/my" icon={<span style={{ fontSize: 20 }}>�</span>} title="我的" />
                 </TabBar>
             </div>
         </div>

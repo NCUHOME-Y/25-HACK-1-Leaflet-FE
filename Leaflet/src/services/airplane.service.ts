@@ -1,4 +1,3 @@
-// src/services/airplane.service.ts
 import apiClient from './apiClient';
 
 export const publishAirplane = (content: string) => {
@@ -11,4 +10,4 @@ export const pickAirplane = () => {
 
 export const getDailyLimit = () => {
   return apiClient.get('/api/airplane/daily-limit');
-};
+};   
