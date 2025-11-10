@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Grid, TabBar } from "antd-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
+import { updateSceneClick } from "../../services/mind.service";
 
 type Scene = {
   key: string;
@@ -34,9 +35,30 @@ export default function MoodRecordPage() {
     return "/record";
   }, [location.pathname]);
 
-  const handleClickScene = (scene: Scene) => {
-    // 跳转到写纸条页面，并携带选中的场景（写页可按需读取）
-    navigate("/airplane/write", { state: { scene: scene.title } });
+  const handleClickScene = async (scene: Scene) => {
+    try {
+      // 更新场景点击次数
+      await updateSceneClick(scene.key);
+      
+      // 跳转到场景记录页面，并携带场景信息
+      navigate("/record/scene", {
+        state: {
+          scene: scene.title,
+          sceneKey: scene.key,
+          emoji: scene.emoji
+        }
+      });
+    } catch (error) {
+      console.error('更新场景点击失败:', error);
+      // 即使更新失败也继续跳转
+      navigate("/record/scene", {
+        state: {
+          scene: scene.title,
+          sceneKey: scene.key,
+          emoji: scene.emoji
+        }
+      });
+    }
   };
 
   return (

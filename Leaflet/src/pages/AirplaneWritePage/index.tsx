@@ -1,4 +1,3 @@
-// src/pages/AirplaneWritePage/index.tsx
 import { useState } from 'react';
 import { Input, Button, Toast, Image } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
@@ -39,13 +38,17 @@ export default function AirplaneWritePage() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h3>写纸折纸</h3>
-      <p style={{ fontSize: '14px', color: '#666' }}>写下你想分享的心情，它会变成纸飞机飞向别人的树上</p>
+      <h3>书写</h3>
+      <p style={{ fontSize: '14px', color: '#bac659ff' }}>写下你的感受，它会飞向远方</p>
 
       <Input
         placeholder="写下你的心情（200字内）"
         value={content}
-        onChange={setContent}
+        onChange={(value) => {
+          if (value.length <= 200) {
+            setContent(value);
+          }
+        }}
         maxLength={200}
         style={{ marginBottom: '20px' }}
       />

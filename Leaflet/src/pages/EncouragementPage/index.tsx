@@ -1,4 +1,3 @@
-// src/pages/EncouragementPage/index.tsx
 import { useState, useMemo } from 'react';
 import { Button, Toast, Space, Tag, TabBar } from 'antd-mobile';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -105,7 +104,7 @@ export default function EncouragementPage() {
 
             {/* 温馨提示 */}
             <div style={{ marginTop: '40px', fontSize: '13px', color: '#999', marginBottom: 32 }}>
-                每日仅可获取 1 次，内容由人工编写，温暖不重复 ❤️
+                温暖不重复 ❤️
             </div>
 
             {/* 底部导航 */}

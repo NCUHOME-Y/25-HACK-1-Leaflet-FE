@@ -1,4 +1,3 @@
-// src/pages/AirplanePickPage/index.tsx
 import { useState, useEffect } from 'react';
 import { Button, Toast, Image, Space } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';

@@ -9,3 +9,8 @@ export const getUserProfile = () => {
 export const updateNickname = (nickname: string) => {
   return apiClient.patch('/api/user/nickname', { nickname });
 };
+
+// 修改头像（约定传入头像的标识或 URL）
+export const updateAvatar = (avatar: string) => {
+  return apiClient.patch('/api/user/avatar', { avatar });
+};
