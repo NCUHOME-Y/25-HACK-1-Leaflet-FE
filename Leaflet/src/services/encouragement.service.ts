@@ -3,10 +3,6 @@ import apiClient from "./apiClient";
 
 // 后端接口：GET /api/encouragements
 export const getTodayEncouragement = () => {
-<<<<<<< HEAD
-    return apiClient.get("/api/encouragements");
-};
-=======
   return apiClient.get('/encouragements');
 };
 
@@ -44,4 +40,3 @@ export const getEncouragementMessage = async (): Promise<string> => {
   // fallback: try to stringify but throw to indicate unexpected format
   throw new Error('无法从接口响应中解析出 message 字段');
 };
->>>>>>> a07c3129965741b50e2bce3c3f471177191f3305
