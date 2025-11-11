@@ -1,11 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Button, Toast, Image, Space, TabBar, CenterPopup, Input } from 'antd-mobile';
 import { useNavigate, useLocation } from 'react-router-dom';
-import defaultAvatar from '../../assets/images/default-avatar.png';
-import treeSeed from '../../assets/images/tree-seed.png';
-import treeWithLeaves from '../../assets/images/tree-with-leaves.png';
-import airplaneFly from '../../assets/images/airplane-fly.png';
-import airplanePick from '../../assets/images/airplane-pick.png';
+import { useUser } from '../../lib/hooks/useUser';
+import avatar1 from '../../assets/images/avatar/avatar-1.png';
+import avatar2 from '../../assets/images/avatar/avatar-2.png';
+import avatar3 from '../../assets/images/avatar/avatar-3.png';
+import avatar4 from '../../assets/images/avatar/avatar-4.png';
+import avatar5 from '../../assets/images/avatar/avatar-5.png';
+import avatar6 from '../../assets/images/avatar/avatar-6.png';
 import iconArchive from '../../assets/images/icon-archive.png';
 import iconAbout from '../../assets/images/icon-about.png';
 
@@ -22,49 +24,30 @@ export default function MyPage() {
     return "/my";
   }, [location.pathname]);
 
-  const [user, setUser] = useState({
-    nickname: 'NCU心情小伙伴',
-    avatar: defaultAvatar,
-    school: '南昌大学',
-    stats: {
-      totalRecords: 0,
-      consecutiveDays: 0,
-      treeLevel: 1
-    }
-  });
+  // 使用自定义hook管理用户状态
+  const { user, loading, updateNickname, updateAvatar } = useUser();
 
   // 编辑弹窗状态
   const [editVisible, setEditVisible] = useState(false);
   const [formNickname, setFormNickname] = useState('');
   const [formAvatar, setFormAvatar] = useState<string>('');
 
-  const avatarOptions = [
-    defaultAvatar,
-    treeSeed,
-    treeWithLeaves,
-    airplaneFly,
-    airplanePick,
-    iconArchive,
-  ];
+  const avatarOptions = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6];
 
-  // 获取用户信息（含统计）
-  useEffect(() => {
-    // 【P0 阶段】先用 Mock 数据，确保页面可跑
-    const mockUser = {
-      nickname: 'NCU小伙伴',
-      avatar: defaultAvatar,
-      school: '南昌大学',
-      stats: {
-        totalRecords: 3,
-        consecutiveDays: 2,
-        treeLevel: 2
-      }
-    };
-    setUser(mockUser);
-
-    // 【后期替换为真实请求】
-    // getUserProfile().then(res => setUser(res.data)).catch(...);
-  }, []);
+  // 如果正在加载，显示加载状态
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #edfff5 0%, #f6fffb 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div>加载中...</div>
+      </div>
+    );
+  }
 
   // 打开编辑弹窗
   const handleOpenEdit = () => {
@@ -81,21 +64,23 @@ export default function MyPage() {
       return;
     }
 
-    // 先本地更新，确保交互流畅；同时可并发请求后端
-    setUser(prev => ({ ...prev, nickname, avatar: formAvatar || prev.avatar }));
+    // 使用自定义hook更新用户信息（会自动保存到localStorage）
+    updateNickname(nickname);
+    updateAvatar(formAvatar || user.avatar);
     setEditVisible(false);
     Toast.show('保存中…');
 
     // 可在此调用后端接口（若后端不可用则静默失败）
     try {
-      const { updateNickname, updateAvatar } = await import('../../services/user.service');
+      const { updateNickname: updateNicknameApi, updateAvatar: updateAvatarApi } = await import('../../services/user.service');
       await Promise.allSettled([
-        updateNickname(nickname),
-        updateAvatar(formAvatar || user.avatar),
+        updateNicknameApi(nickname),
+        updateAvatarApi(formAvatar || user.avatar),
       ]);
       Toast.show('资料已更新');
     } catch (e) {
       // 静默处理，保留本地状态
+      console.error('更新用户信息失败:', e);
     }
   };
 
@@ -191,7 +176,7 @@ export default function MyPage() {
           </Space>
         </div>
 
-        {/* 精简功能入口：仅保留「个人心情档案」和「关于我们」 */}
+        {/* 「个人心情档案」和「关于我们」 */}
         <div style={{ textAlign: 'left' }}>
           <div
             style={{
