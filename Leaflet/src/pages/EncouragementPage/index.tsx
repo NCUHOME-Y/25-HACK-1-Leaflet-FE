@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Button, Toast, Space, Tag, TabBar } from 'antd-mobile';
 import { useLocation, useNavigate } from 'react-router-dom';
-// import { getTodayEncouragement } from '../../services/encouragement.service'; // 待实现
+import { getEncouragementMessage } from '../../services/encouragement.service';
 
 export default function EncouragementPage() {
     const [todayEncouragement, setTodayEncouragement] = useState<string | null>(null);
@@ -21,17 +21,14 @@ export default function EncouragementPage() {
     const handleGetEncouragement = async () => {
         setIsLoading(true);
         try {
-            // const res = await getTodayEncouragement();
-            // 临时 mock 数据
-            const mockEncouragement = '每一次努力都值得被看见，加油！💪';
-            setTodayEncouragement(mockEncouragement);
+            const message = await getEncouragementMessage();
+            setTodayEncouragement(message);
             setIsFetched(true);
-            Toast.show({
-                content: '获取成功！',
-                duration: 1500
-            });
+            Toast.show({ content: '获取成功！', duration: 1500 });
         } catch (error) {
-            Toast.show('获取失败，请重试～');
+            console.error('获取鼓励语失败:', error);
+            const errorMessage = error instanceof Error ? error.message : '网络错误';
+            Toast.show({ content: `获取失败: ${errorMessage}`, duration: 2000 });
         } finally {
             setIsLoading(false);
         }
