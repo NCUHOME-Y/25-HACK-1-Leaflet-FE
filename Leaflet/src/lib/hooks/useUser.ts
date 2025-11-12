@@ -9,6 +9,7 @@ export interface UserStats {
 }
 
 export interface User {
+    id: string;
     nickname: string;
     avatar: string;
     school: string;
@@ -29,7 +30,8 @@ const getUserFromStorage = (): User => {
     }
 
     // 默认用户信息
-    return {
+    const defaultUser: User = {
+        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         nickname: "NCU心情小伙伴",
         avatar: avatar1,
         school: "南昌大学",
@@ -39,6 +41,9 @@ const getUserFromStorage = (): User => {
             treeLevel: 1,
         },
     };
+    // 保存默认用户信息
+    saveUserToStorage(defaultUser);
+    return defaultUser;
 };
 
 // 保存用户信息到localStorage

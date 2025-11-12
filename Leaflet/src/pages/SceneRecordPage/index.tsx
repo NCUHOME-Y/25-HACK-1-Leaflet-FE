@@ -3,11 +3,13 @@ import { Button, Toast, Image } from 'antd-mobile';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { recordMind, getSceneRecords } from '../../services/mind.service';
 import type { MindRecord } from '../../services/mind.service';
+import { useUser } from '../../lib/hooks/useUser';
 import airplaneFlyImg from '../../assets/images/airplane-fly.png';
 
 export default function SceneRecordPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useUser();
   const [content, setContent] = useState('');
   const [records, setRecords] = useState<MindRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,6 +55,7 @@ export default function SceneRecordPage() {
     setLoading(true);
     try {
       await recordMind({
+        id: user.id,
         scene,
         sceneKey,
         content: content.trim()
