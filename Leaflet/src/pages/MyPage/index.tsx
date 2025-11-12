@@ -1,14 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {
     Button,
     Toast,
     Image,
     Space,
-    TabBar,
     CenterPopup,
     Input,
 } from "antd-mobile";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../../lib/hooks/useUser";
 import avatar1 from "../../assets/images/avatar/avatar-1.png";
 import avatar2 from "../../assets/images/avatar/avatar-2.png";
@@ -21,16 +20,6 @@ import iconAbout from "../../assets/images/icon-about.png";
 
 export default function MyPage() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const activeKey = useMemo(() => {
-        // 让 TabBar 高亮当前路由
-        if (location.pathname.startsWith("/tree")) return "/tree";
-        if (location.pathname.startsWith("/record")) return "/record";
-        if (location.pathname.startsWith("/encouragement"))
-            return "/encouragement";
-        if (location.pathname.startsWith("/my")) return "/my";
-        return "/my";
-    }, [location.pathname]);
 
     // 使用自定义hook管理用户状态
     const { user, loading, updateNickname, updateAvatar } = useUser();
@@ -110,7 +99,7 @@ export default function MyPage() {
             style={{
                 minHeight: "100vh",
                 background: "linear-gradient(180deg, #edfff5 0%, #f6fffb 100%)",
-                paddingBottom: "76px",
+                paddingBottom: "20px",
             }}
         >
             <div style={{ padding: "20px", textAlign: "center" }}>
@@ -257,7 +246,7 @@ export default function MyPage() {
                             cursor: "pointer",
                             backgroundColor: "#fff",
                         }}
-                        onClick={() => navigate("/record")}
+                        onClick={() => navigate("/record/history")}
                     >
                         <Space align="center">
                             <Image
@@ -396,46 +385,6 @@ export default function MyPage() {
                     </Button>
                 </div>
             </CenterPopup>
-
-            {/* 底部导航 TabBar */}
-            <div
-                style={{
-                    position: "fixed",
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: "#fff",
-                    borderTop: "1px solid #eee",
-                }}
-            >
-                <TabBar
-                    activeKey={activeKey}
-                    onChange={(key) => {
-                        navigate(key);
-                    }}
-                >
-                    <TabBar.Item
-                        key="/tree"
-                        icon={<span style={{ fontSize: 20 }}>🌳</span>}
-                        title="心情树"
-                    />
-                    <TabBar.Item
-                        key="/record"
-                        icon={<span style={{ fontSize: 20 }}>📝</span>}
-                        title="心情记录"
-                    />
-                    <TabBar.Item
-                        key="/encouragement"
-                        icon={<span style={{ fontSize: 20 }}>💬</span>}
-                        title="每日鼓励"
-                    />
-                    <TabBar.Item
-                        key="/my"
-                        icon={<span style={{ fontSize: 20 }}>👤</span>}
-                        title="我的"
-                    />
-                </TabBar>
-            </div>
         </div>
     );
 }

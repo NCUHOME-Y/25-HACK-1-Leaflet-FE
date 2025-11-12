@@ -1,61 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
-import { Toast, TabBar } from "antd-mobile";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Toast } from "antd-mobile";
+import { useNavigate } from "react-router-dom";
 import { getDailyLimit } from "../../services/airplane.service";
 import treeImage from "../../assets/images/tree/tree.png";
 
-// 添加动画样式
-const animationStyles = `
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  @keyframes gentle-sway {
-    0%, 100% { transform: rotate(-2deg); }
-    50% { transform: rotate(2deg); }
-  }
-  
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.8; }
-  }
-  
-  @keyframes paper-plane-fly {
-    0% { transform: translateX(0px) translateY(0px); }
-    25% { transform: translateX(5px) translateY(-3px); }
-    50% { transform: translateX(10px) translateY(0px); }
-    75% { transform: translateX(5px) translateY(3px); }
-    100% { transform: translateX(0px) translateY(0px); }
-  }
-  
-  @keyframes bird-fly {
-    0% { transform: translateX(0px) translateY(0px); }
-    33% { transform: translateX(3px) translateY(-2px); }
-    66% { transform: translateX(6px) translateY(1px); }
-    100% { transform: translateX(0px) translateY(0px); }
-  }
-  
-  .floating { animation: float 3s ease-in-out infinite; }
-  .swaying { animation: gentle-sway 4s ease-in-out infinite; transform-origin: bottom center; }
-  .twinkling { animation: twinkle 2s ease-in-out infinite; }
-  .paper-plane { animation: paper-plane-fly 5s ease-in-out infinite; }
-  .bird-flying { animation: bird-fly 3s ease-in-out infinite; }
-`;
-
 export default function TreePage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [dailyLimit, setDailyLimit] = useState({ used: 0, limit: 3 });
-
-  const activeKey = useMemo(() => {
-    if (location.pathname.startsWith("/tree")) return "/tree";
-    if (location.pathname.startsWith("/record")) return "/record";
-    if (location.pathname.startsWith("/encouragement"))
-      return "/encouragement";
-    if (location.pathname.startsWith("/my")) return "/my";
-    return "/tree";
-  }, [location.pathname]);
 
   // 获取今日捞取次数
   useEffect(() => {
@@ -84,21 +35,18 @@ export default function TreePage() {
   };
 
   return (
-    <>
-      <style>{animationStyles}</style>
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #e8f5f0 0%, #f0faf6 50%, #e6f7f2 100%)",
-          padding: "20px 16px 76px",
-          boxSizing: "border-box",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
+    <div
+      style={{
+        background: "linear-gradient(135deg, #e8f5f0 0%, #f0faf6 50%, #e6f7f2 100%)",
+        padding: "20px 16px",
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
         {/* 背景装饰 */}
         <div style={{
           position: "absolute",
@@ -305,47 +253,6 @@ export default function TreePage() {
             </div>
           </div>
         </div>
-
-        {/* 底部导航 */}
-        <div
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "#fff",
-            borderTop: "1px solid #eee",
-          }}
-        >
-          <TabBar
-            activeKey={activeKey}
-            onChange={(key) => {
-              navigate(key);
-            }}
-          >
-            <TabBar.Item
-              key="/tree"
-              icon={<span style={{ fontSize: 20 }}>🌳</span>}
-              title="心情树"
-            />
-            <TabBar.Item
-              key="/record"
-              icon={<span style={{ fontSize: 20 }}>📝</span>}
-              title="心情记录"
-            />
-            <TabBar.Item
-              key="/encouragement"
-              icon={<span style={{ fontSize: 20 }}>💬</span>}
-              title="每日鼓励"
-            />
-            <TabBar.Item
-              key="/my"
-              icon={<span style={{ fontSize: 20 }}>�</span>}
-              title="我的"
-            />
-          </TabBar>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

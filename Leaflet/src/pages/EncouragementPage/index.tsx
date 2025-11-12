@@ -1,22 +1,11 @@
-import { useState, useMemo } from 'react';
-import { Button, Toast, Space, Tag, TabBar } from 'antd-mobile';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Button, Toast, Space, Tag } from 'antd-mobile';
 import { getEncouragementMessage } from '../../services/encouragement.service';
 
 export default function EncouragementPage() {
     const [todayEncouragement, setTodayEncouragement] = useState<string | null>(null);
     const [isFetched, setIsFetched] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const activeKey = useMemo(() => {
-        if (location.pathname.startsWith('/tree')) return '/tree';
-        if (location.pathname.startsWith('/record')) return '/record';
-        if (location.pathname.startsWith('/encouragement')) return '/encouragement';
-        if (location.pathname.startsWith('/my')) return '/my';
-        return '/encouragement';
-    }, [location.pathname]);
 
     const handleGetEncouragement = async () => {
         setIsLoading(true);
@@ -35,7 +24,7 @@ export default function EncouragementPage() {
     };
 
     return (
-        <div style={{ padding: '20px', textAlign: 'center', minHeight: '100vh', paddingBottom: 90 }}>
+        <div style={{ padding: '20px', textAlign: 'center', minHeight: '100vh' }}>
             <h2>每日鼓励</h2>
             <p style={{ fontSize: '14px', color: '#666', marginBottom: '24px' }}>
                 温暖的话语，陪你前行 🌟
@@ -102,30 +91,6 @@ export default function EncouragementPage() {
             {/* 温馨提示 */}
             <div style={{ marginTop: '40px', fontSize: '13px', color: '#999', marginBottom: 32 }}>
                 温暖不重复 ❤️
-            </div>
-
-            {/* 底部导航 */}
-            <div
-                style={{
-                    position: 'fixed',
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: '#fff',
-                    borderTop: '1px solid #eee'
-                }}
-            >
-                <TabBar
-                    activeKey={activeKey}
-                    onChange={(key) => {
-                        navigate(key);
-                    }}
-                >
-                    <TabBar.Item key="/tree" icon={<span style={{ fontSize: 20 }}>🌳</span>} title="心情树" />
-                    <TabBar.Item key="/record" icon={<span style={{ fontSize: 20 }}>📝</span>} title="心情记录" />
-                    <TabBar.Item key="/encouragement" icon={<span style={{ fontSize: 20 }}>💬</span>} title="每日鼓励" />
-                    <TabBar.Item key="/my" icon={<span style={{ fontSize: 20 }}>�</span>} title="我的" />
-                </TabBar>
             </div>
         </div>
     );

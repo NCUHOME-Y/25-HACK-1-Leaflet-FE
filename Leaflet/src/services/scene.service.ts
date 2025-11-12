@@ -14,7 +14,7 @@ export const getSceneStats = () => {
  * 如果后端支持按场景查询，可使用此接口（可选）
  */
 export const getSceneStatsByKey = (sceneKey: string) => {
-    return apiClient.get(`/api/mind/stats/${sceneKey}`);
+    return apiClient.get(`/status/by_tag/3/${sceneKey}`);
 };
 
 /**
