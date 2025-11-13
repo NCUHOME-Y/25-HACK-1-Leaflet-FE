@@ -1,0 +1,23 @@
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* 已禁止滚动 */
+}
+
+body {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden; /* 已禁止滚动 */
+}
+
+/* 修复 CenterPopup 居中问题 */
+.adm-center-popup-body {
+    position: relative !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 auto !important;
+}
