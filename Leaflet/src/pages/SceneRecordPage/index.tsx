@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Button, Toast, Image } from 'antd-mobile';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { recordMind, getSceneRecords } from '../../services/mind.service';
-import type { MindRecord } from '../../services/mind.service';
+import { recordMind, getAllRecords } from '../../services/mind.service';
 import { useUser } from '../../lib/hooks/useUser';
 import airplaneFlyImg from '../../assets/images/airplane-fly.png';
+
+// 本地定义记录的接口类型
+interface MindRecord {
+  id?: string;
+  content: string;
+  timestamp?: string;
+}
 
 export default function SceneRecordPage() {
   const navigate = useNavigate();
@@ -16,14 +22,12 @@ export default function SceneRecordPage() {
 
   // 从路由状态获取场景信息
   const scene = location.state?.scene || '';
-  const sceneKey = location.state?.sceneKey || '';
+  const tag_id = location.state?.tag_id || 0;  // 接收数字ID
   const emoji = location.state?.emoji || '';
 
   useEffect(() => {
-    if (sceneKey) {
-      loadSceneRecords();
-    }
-  }, [sceneKey]);
+    loadAllRecords();
+  }, []);
 
   // 快速模板
   const quickTemplates = [
@@ -33,9 +37,9 @@ export default function SceneRecordPage() {
     '感谢今天的___。'
   ];
 
-  const loadSceneRecords = async () => {
+  const loadAllRecords = async () => {
     try {
-      const response = await getSceneRecords(sceneKey);
+      const response = await getAllRecords();
       setRecords(response.data || []);
     } catch (error) {
       console.error('加载记录失败:', error);
@@ -54,28 +58,27 @@ export default function SceneRecordPage() {
 
     setLoading(true);
     try {
+      // 只传递后端需要的 tag_id 和 content
       await recordMind({
-        id: user.id,
-        scene,
-        sceneKey,
+        tag_id: tag_id,  // 已经是数字类型
         content: content.trim()
       });
 
       // 显示成功提示
       Toast.show({
         content: '记录已保存～',
-        duration: 2000,
+        duration: 1000,
         icon: <Image src={airplaneFlyImg} style={{ width: '60px', height: '60px' }} />,
       });
 
       // 清空输入框并重新加载记录
       setContent('');
-      loadSceneRecords();
+      loadAllRecords();
 
-      // 2秒后返回记录页面
+      // 立即返回记录页面
       setTimeout(() => {
         navigate('/record');
-      }, 2000);
+      }, 200);
     } catch (error) {
       console.error('保存记录失败:', error);
       Toast.show('保存失败，请重试');

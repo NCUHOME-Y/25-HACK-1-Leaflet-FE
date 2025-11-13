@@ -423,15 +423,18 @@ export default function MyPage() {
                                 fontSize: 64,
                                 marginBottom: 16,
                                 animation: "float 3s ease-in-out infinite",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                             }}
                         >
-                            🕊️
+                            ➕🕊️
                         </div>
                         <h2 style={{ margin: 0, color: "#1a7f5a", fontSize: 24, fontWeight: 600 }}>
                             Leaflet
                         </h2>
                         <p style={{ fontSize: 14, color: "#6aa893", margin: "8px 0 0" }}>
-                            ➕🕊️yybs
+                            ➕🕊️yyds
                         </p>
                     </div>
 
@@ -451,10 +454,10 @@ export default function MyPage() {
                                 💚 关于 Leaflet
                             </div>
                             <div style={{ fontSize: 14, color: "#52b788" }}>
-                                我们是一群关注大学生心理健康的开发者，希望通过这个小应用，为你提供一个温暖的树洞，记录心情、分享感受、互相鼓励。
+                                我们是一群关注大学生心理健康的开发者，是家园工作室考核第一组小登，希望通过这个小应用，为你提供一个温暖的树洞，记录心情、分享感受、互相鼓励。
                             </div>
                             <div style={{ marginTop: 16, fontSize: 13, color: "#95d5b2", textAlign: "center" }}>
-                                ➕🕊️yybs ✨
+                                ➕🕊️yyds ✨
                             </div>
                         </div>
                     </div>

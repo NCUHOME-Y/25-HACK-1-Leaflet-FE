@@ -3,11 +3,13 @@ import { Toast } from "antd-mobile";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { getDailyLimit } from "../../services/airplane.service";
+import { getUserLevel, UserLevel } from "../../services/mind.service";
 import treeImage from "../../assets/images/tree/tree.png";
 
 export default function TreePage() {
   const navigate = useNavigate();
   const [dailyLimit, setDailyLimit] = useState({ used: 0, limit: 3 });
+  const [userLevel, setUserLevel] = useState<UserLevel>({ level: 1, record_days: 0 });
 
   // 获取今日捞取次数
   useEffect(() => {
@@ -18,6 +20,20 @@ export default function TreePage() {
       .catch(() => {
         // Mock 数据兜底
         setDailyLimit({ used: 0, limit: 3 });
+      });
+  }, []);
+
+  // 获取用户等级信息
+  useEffect(() => {
+    getUserLevel()
+      .then((res) => {
+        console.log('用户等级数据:', res.data);
+        setUserLevel(res.data);
+      })
+      .catch((err) => {
+        console.error('获取用户等级失败:', err);
+        // 使用默认值
+        setUserLevel({ level: 1, record_days: 0 });
       });
   }, []);
 
@@ -137,7 +153,7 @@ export default function TreePage() {
               display: "inline-block",
             }}
           >
-            🌱 等级 1
+            🌱 等级 {userLevel.level}
           </span>
         </div>
 
@@ -150,7 +166,7 @@ export default function TreePage() {
             marginBottom: 8,
           }}
         >
-          已记录 0 天
+          已记录 {userLevel.record_days} 天
         </div>
         <div style={{
           color: "#00a878",
@@ -158,7 +174,9 @@ export default function TreePage() {
           fontWeight: "500",
           lineHeight: 1.4
         }}>
-          开始第一次记录，解锁你的香樟树苗！
+          {userLevel.record_days === 0
+            ? "开始第一次记录，解锁你的香樟树苗！"
+            : "继续加油，让心情树茁壮成长！"}
         </div>
       </div>
 
@@ -261,3 +279,4 @@ export default function TreePage() {
     </div>
   );
 }
+

@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Grid, TabBar } from "antd-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
-import { updateSceneClick } from "../../services/mind.service";
+import { updateSceneClick, getTagCount } from "../../services/mind.service";
 
 type Scene = {
+  id: number;      // 后端需要的数字ID
   key: string;
   title: string;
   emoji: string;
@@ -11,20 +12,22 @@ type Scene = {
 };
 
 const scenes: Scene[] = [
-  { key: "early", title: "困倦的早八", emoji: "😴", count: 23 },
-  { key: "study", title: "自习室刷题", emoji: "📝", count: 45 },
-  { key: "library", title: "图书馆阅读", emoji: "📖", count: 18 },
-  { key: "canteen", title: "食堂干饭", emoji: "🍚", count: 67 },
-  { key: "exam", title: "备考冲刺", emoji: "⏳", count: 34 },
-  { key: "club", title: "社团活动", emoji: "🎭", count: 12 },
-  { key: "mood", title: "情绪波动时", emoji: "😡", count: 28 },
-  { key: "review", title: "睡前复盘", emoji: "🌙", count: 56 },
-  { key: "social", title: "社交活动后", emoji: "👥", count: 19 },
+  { id: 1, key: "early", title: "困倦的早八", emoji: "😴", count: 23 },
+  { id: 2, key: "study", title: "自习室刷题", emoji: "📝", count: 45 },
+  { id: 3, key: "library", title: "图书馆阅读", emoji: "📖", count: 18 },
+  { id: 4, key: "canteen", title: "食堂干饭", emoji: "🍚", count: 67 },
+  { id: 5, key: "exam", title: "备考冲刺", emoji: "⏳", count: 34 },
+  { id: 6, key: "club", title: "社团活动", emoji: "🎭", count: 12 },
+  { id: 7, key: "mood", title: "情绪波动时", emoji: "😡", count: 28 },
+  { id: 8, key: "review", title: "睡前复盘", emoji: "🌙", count: 56 },
+  { id: 9, key: "social", title: "社交活动后", emoji: "👥", count: 19 },
 ];
 
 export default function MoodRecordPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [scenesWithCount, setScenesWithCount] = useState<Scene[]>(scenes);
+
   const activeKey = useMemo(() => {
     // 让 TabBar 高亮当前路由
     if (location.pathname.startsWith("/tree")) return "/tree";
@@ -35,16 +38,47 @@ export default function MoodRecordPage() {
     return "/record";
   }, [location.pathname]);
 
+  // 页面加载时获取所有场景的实时人数
+  useEffect(() => {
+    const fetchAllCounts = async () => {
+      try {
+        // 并行请求所有场景的人数
+        const countPromises = scenes.map(scene =>
+          getTagCount(scene.id)
+            .then(res => ({ id: scene.id, count: res.data?.count || 0 }))
+            .catch(() => ({ id: scene.id, count: 0 }))
+        );
+        
+        const counts = await Promise.all(countPromises);
+        
+        // 更新场景数据
+        const updatedScenes = scenes.map(scene => {
+          const countData = counts.find(c => c.id === scene.id);
+          return {
+            ...scene,
+            count: countData?.count || 0
+          };
+        });
+        
+        setScenesWithCount(updatedScenes);
+      } catch (error) {
+        console.error('获取场景人数失败:', error);
+      }
+    };
+
+    fetchAllCounts();
+  }, []);
+
   const handleClickScene = async (scene: Scene) => {
     try {
       // 更新场景点击次数
       await updateSceneClick(scene.key);
       
-      // 跳转到场景记录页面，并携带场景信息
+      // 跳转到场景记录页面，并携带场景信息(传递数字ID)
       navigate("/record/scene", {
         state: {
           scene: scene.title,
-          sceneKey: scene.key,
+          tag_id: scene.id,  // 传递数字ID给后端
           emoji: scene.emoji
         }
       });
@@ -54,7 +88,7 @@ export default function MoodRecordPage() {
       navigate("/record/scene", {
         state: {
           scene: scene.title,
-          sceneKey: scene.key,
+          tag_id: scene.id,  // 传递数字ID给后端
           emoji: scene.emoji
         }
       });
@@ -87,7 +121,7 @@ export default function MoodRecordPage() {
 
       {/* 场景九宫格 */}
       <Grid columns={2} gap={12}>
-        {scenes.map((s) => (
+        {scenesWithCount.map((s) => (
           <Grid.Item key={s.key}>
             <div
               onClick={() => handleClickScene(s)}
