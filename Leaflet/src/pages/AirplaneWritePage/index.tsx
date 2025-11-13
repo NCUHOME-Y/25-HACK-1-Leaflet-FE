@@ -162,6 +162,31 @@ export default function AirplaneWritePage() {
           {content.length}/200 字
         </div>
       </div>
+
+      {/* 发送按钮 */}
+      <div style={{ maxWidth: 500, margin: '0 auto' }}>
+        <Button
+          color="primary"
+          size="large"
+          block
+          onClick={handlePublish}
+          loading={isSending}
+          disabled={!content.trim() || isSending}
+          style={{
+            background: content.trim()
+              ? 'linear-gradient(135deg, #00a878 0%, #00c896 100%)'
+              : '#d8f3dc',
+            border: 'none',
+            borderRadius: 12,
+            height: 52,
+            fontSize: 17,
+            fontWeight: 600,
+            color: content.trim() ? '#fff' : '#95d5b2',
+          }}
+        >
+          {isSending ? '折纸中...' : '折成纸飞机并放飞'}
+        </Button>
+      </div>
     </div>
   );
 }
