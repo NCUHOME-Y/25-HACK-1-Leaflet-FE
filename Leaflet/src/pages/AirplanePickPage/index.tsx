@@ -5,6 +5,11 @@ import { Icon } from "@iconify/react";
 import { getSolve, replyToAirplane } from "../../services/airplane.service";
 import airplanePickImg from "../../assets/images/airplane-pick.png";
 
+interface ComfortMessage {
+    content: string;
+    timestamp: string;
+}
+
 export default function AirplanePickPage() {
     const navigate = useNavigate();
     const [airplaneContent, setAirplaneContent] = useState<string | null>(null);
@@ -12,12 +17,9 @@ export default function AirplanePickPage() {
     const [replyVisible, setReplyVisible] = useState(false);
     const [replyContent, setReplyContent] = useState("");
     const [sending, setSending] = useState(false);
+    const [comfortList, setComfortList] = useState<ComfortMessage[]>([]); // 收到的安慰列表
 
     useEffect(() => {
-        // 🎭 演示模式配置
-        const demoMode = true; // 改为 false 使用真实接口
-        const simulateLimitExceeded = true; // true=模拟超限, false=模拟正常获取
-
         // 显示"正在取下纸飞机～" + 静态图
         Toast.show({
             content: "正在取下纸飞机～",
@@ -30,29 +32,8 @@ export default function AirplanePickPage() {
             ),
         });
 
-        // 0.8秒后调用获取情绪疏导接口或执行演示
+        // 0.8秒后调用获取情绪疏导接口
         const timer = setTimeout(() => {
-            // 🎭 演示模式
-            if (demoMode) {
-                setIsLoading(false);
-
-                if (simulateLimitExceeded) {
-                    console.log("🎭 演示：模拟次数超限");
-                    setAirplaneContent(null);
-                    Toast.show({
-                        icon: "fail",
-                        content: "今日摘取次数已用完，明天再来吧～",
-                        duration: 2500,
-                    });
-                    setTimeout(() => navigate("/tree"), 3000);
-                    return;
-                } else {
-                    console.log("🎭 演示：正常获取纸飞机");
-                    setAirplaneContent("今天早八好困，但坚持住了！加油💪");
-                    Toast.show("纸飞机已打开！");
-                    return;
-                }
-            }
 
             // 真实接口调用
             setIsLoading(true);
@@ -82,6 +63,14 @@ export default function AirplanePickPage() {
                         Toast.show("当前暂无新纸飞机，稍后再来试试吧～");
                     } else {
                         setAirplaneContent(data.content);
+                        // 如果后端返回了安慰信息，添加到列表
+                        if (data.comfort) {
+                            const newComfort: ComfortMessage = {
+                                content: data.comfort,
+                                timestamp: new Date().toISOString(),
+                            };
+                            setComfortList(prev => [newComfort, ...prev]);
+                        }
                         Toast.show("纸飞机已打开！");
                     }
                 })
@@ -101,20 +90,12 @@ export default function AirplanePickPage() {
                             navigate("/tree");
                         }, 3000);
                     } else {
-                        // Mock 数据兜底 - 模拟有别人的纸飞机
-                        const mockAirplanes = [
-                            "今天早八好困，但坚持住了！加油💪",
-                            "图书馆刷了一下午题，累但充实～希望大家考试都能过！",
-                            "食堂的红烧肉真的太好吃了！心情瞬间变好😋",
-                            "明天就要考试了，有点紧张，但我相信自己一定可以的！",
-                            "今天和朋友聊了很久，感觉压力释放了不少，谢谢陪伴❤️",
-                            "睡前复盘一下今天，虽然有些小遗憾，但明天继续努力！晚安🌙",
-                            "终于完成了小组作业，团队协作真的很重要！",
-                            "在操场跑了几圈，运动后心情好多了🏃",
-                        ];
-                        const randomContent = mockAirplanes[Math.floor(Math.random() * mockAirplanes.length)];
-                        setAirplaneContent(randomContent);
-                        Toast.show("纸飞机已打开！");
+                        // 显示错误信息
+                        setAirplaneContent(null);
+                        Toast.show({
+                            icon: "fail",
+                            content: "获取纸飞机失败，请稍后重试",
+                        });
                     }
                 });
         }, 800);
@@ -139,6 +120,13 @@ export default function AirplanePickPage() {
         setSending(true);
         try {
             await replyToAirplane(replyContent.trim());
+            // 将发送的回复添加到安慰列表
+            const newComfort: ComfortMessage = {
+                content: replyContent.trim(),
+                timestamp: new Date().toISOString(),
+            };
+            setComfortList(prev => [newComfort, ...prev]);
+
             Toast.show({
                 icon: "success",
                 content: "回复已发送～",
@@ -231,21 +219,39 @@ export default function AirplanePickPage() {
                     <div style={{ fontSize: 14, color: "#95d5b2", marginBottom: 30 }}>
                         稍后再来看看吧～
                     </div>
-                    <Button
-                        color="primary"
-                        size="large"
-                        onClick={() => navigate("/tree")}
-                        style={{
-                            background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
-                            border: "none",
-                            borderRadius: 12,
-                            padding: "12px 40px",
-                            fontSize: 16,
-                            fontWeight: 600,
-                        }}
-                    >
-                        🌳 返回心情树
-                    </Button>
+                    <div style={{ display: "flex", gap: "12px" }}>
+                        <Button
+                            color="primary"
+                            size="large"
+                            block
+                            onClick={() => window.location.reload()}
+                            style={{
+                                background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
+                                border: "none",
+                                borderRadius: 12,
+                                padding: "12px 40px",
+                                fontSize: 16,
+                                fontWeight: 600,
+                            }}
+                        >
+                            🔄 刷新摘取
+                        </Button>
+                        <Button
+                            fill="outline"
+                            size="large"
+                            block
+                            onClick={() => navigate("/tree")}
+                            style={{
+                                borderColor: "#00a878",
+                                color: "#00a878",
+                                borderRadius: 12,
+                                padding: "12px 40px",
+                                fontSize: 16,
+                            }}
+                        >
+                            🌳 返回
+                        </Button>
+                    </div>
                 </div>
             ) : airplaneContent ? (
                 <div
@@ -288,7 +294,7 @@ export default function AirplanePickPage() {
                                 marginBottom: 16,
                             }}
                         >
-                            ✈️
+
                         </div>
                         <p
                             style={{
@@ -324,7 +330,7 @@ export default function AirplanePickPage() {
                             fill="outline"
                             size="large"
                             block
-                            onClick={() => navigate("/tree")}
+                            onClick={() => window.location.reload()}
                             style={{
                                 borderColor: "#00a878",
                                 color: "#00a878",
@@ -333,9 +339,65 @@ export default function AirplanePickPage() {
                                 fontSize: 16,
                             }}
                         >
-                            🌳 返回心情树
+                            🔄 刷新
                         </Button>
                     </Space>
+
+                    {/* 收到的安慰列表 */}
+                    {comfortList.length > 0 && (
+                        <div style={{ marginTop: 32 }}>
+                            <div
+                                style={{
+                                    fontSize: 18,
+                                    fontWeight: 600,
+                                    color: "#1a7f5a",
+                                    marginBottom: 16,
+                                    textAlign: "center",
+                                }}
+                            >
+                                💚 远方的慰藉
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                {comfortList.map((comfort, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            background: "#ffffff",
+                                            border: "1px solid #d8f3dc",
+                                            borderRadius: "12px",
+                                            padding: "16px",
+                                            boxShadow: "0 2px 8px rgba(0,168,120,0.08)",
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                fontSize: 14,
+                                                color: "#2b2b2b",
+                                                lineHeight: 1.6,
+                                                marginBottom: 8,
+                                            }}
+                                        >
+                                            {comfort.content}
+                                        </div>
+                                        <div
+                                            style={{
+                                                fontSize: 12,
+                                                color: "#95d5b2",
+                                                textAlign: "right",
+                                            }}
+                                        >
+                                            {new Date(comfort.timestamp).toLocaleString('zh-CN', {
+                                                month: '2-digit',
+                                                day: '2-digit',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             ) : null}
 

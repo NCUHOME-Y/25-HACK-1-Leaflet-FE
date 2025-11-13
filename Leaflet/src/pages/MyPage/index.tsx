@@ -29,6 +29,9 @@ export default function MyPage() {
     const [formNickname, setFormNickname] = useState("");
     const [formAvatar, setFormAvatar] = useState<string>("");
 
+    // 关于我们弹窗状态
+    const [aboutVisible, setAboutVisible] = useState(false);
+
     const avatarOptions = [
         avatar1,
         avatar2,
@@ -274,7 +277,7 @@ export default function MyPage() {
                             cursor: "pointer",
                             backgroundColor: "#fff",
                         }}
-                        onClick={() => navigate("/about")}
+                        onClick={() => setAboutVisible(true)}
                     >
                         <Space align="center">
                             <Image
@@ -383,6 +386,96 @@ export default function MyPage() {
                     <Button color="primary" block onClick={handleSaveProfile}>
                         保存
                     </Button>
+                </div>
+            </CenterPopup>
+
+            {/* 关于我们弹窗 */}
+            <CenterPopup
+                visible={aboutVisible}
+                onMaskClick={() => setAboutVisible(false)}
+                onClose={() => setAboutVisible(false)}
+                style={{
+                    "--z-index": "1000",
+                }}
+                bodyStyle={{
+                    width: "calc(100vw - 40px)",
+                    maxWidth: "440px",
+                    borderRadius: "16px",
+                    padding: "0",
+                }}
+            >
+                <div
+                    style={{
+                        background: "linear-gradient(180deg, #e8f5f0 0%, #ffffff 100%)",
+                        padding: "32px 24px",
+                        borderRadius: "16px",
+                        textAlign: "center",
+                    }}
+                >
+                    {/* 顶部装饰 */}
+                    <div style={{ marginBottom: 24 }}>
+                        <div
+                            style={{
+                                fontSize: 64,
+                                marginBottom: 16,
+                                animation: "float 3s ease-in-out infinite",
+                            }}
+                        >
+                            🕊️
+                        </div>
+                        <h2 style={{ margin: 0, color: "#1a7f5a", fontSize: 24, fontWeight: 600 }}>
+                            Leaflet
+                        </h2>
+                        <p style={{ fontSize: 14, color: "#6aa893", margin: "8px 0 0" }}>
+                            ➕🕊️yybs
+                        </p>
+                    </div>
+
+                    {/* 描述文字 */}
+                    <div
+                        style={{
+                            background: "#ffffff",
+                            borderRadius: "12px",
+                            padding: "20px",
+                            marginBottom: 24,
+                            border: "1px solid #d8f3dc",
+                            textAlign: "left",
+                        }}
+                    >
+                        <div style={{ fontSize: 15, color: "#2b2b2b", lineHeight: 1.8 }}>
+                            <div style={{ marginBottom: 12, fontWeight: 600, color: "#00a878" }}>
+                                💚 关于 Leaflet
+                            </div>
+                            <div style={{ fontSize: 14, color: "#52b788" }}>
+                                我们是一群关注大学生心理健康的开发者，希望通过这个小应用，为你提供一个温暖的树洞，记录心情、分享感受、互相鼓励。
+                            </div>
+                            <div style={{ marginTop: 16, fontSize: 13, color: "#95d5b2", textAlign: "center" }}>
+                                ➕🕊️yybs ✨
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 按钮 */}
+                    <Button
+                        color="primary"
+                        block
+                        onClick={() => setAboutVisible(false)}
+                        style={{
+                            background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
+                            border: "none",
+                            borderRadius: 12,
+                            height: 44,
+                        }}
+                    >
+                        知道了
+                    </Button>
+
+                    <style>{`
+                        @keyframes float {
+                            0%, 100% { transform: translateY(0px); }
+                            50% { transform: translateY(-10px); }
+                        }
+                    `}</style>
                 </div>
             </CenterPopup>
         </div>
