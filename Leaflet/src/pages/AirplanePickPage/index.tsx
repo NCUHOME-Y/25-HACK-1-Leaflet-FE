@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
 import { Button, Toast, Image, Space, CenterPopup, TextArea } from "antd-mobile";
 import { useNavigate } from "react-router-dom";
-import { pickAirplane, publishAirplane } from "../../services/airplane.service";
+import { Icon } from "@iconify/react";
+import { getSolve, replyToAirplane } from "../../services/airplane.service";
 import airplanePickImg from "../../assets/images/airplane-pick.png";
 
 export default function AirplanePickPage() {
     const navigate = useNavigate();
     const [airplaneContent, setAirplaneContent] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true); // 添加加载状态
     const [replyVisible, setReplyVisible] = useState(false);
     const [replyContent, setReplyContent] = useState("");
     const [sending, setSending] = useState(false);
 
     useEffect(() => {
+        // 🎭 演示模式配置
+        const demoMode = true; // 改为 false 使用真实接口
+        const simulateLimitExceeded = true; // true=模拟超限, false=模拟正常获取
+
         // 显示"正在取下纸飞机～" + 静态图
         Toast.show({
             content: "正在取下纸飞机～",
@@ -24,33 +30,92 @@ export default function AirplanePickPage() {
             ),
         });
 
-        // 0.8秒后模拟捞取结果
+        // 0.8秒后调用获取情绪疏导接口或执行演示
         const timer = setTimeout(() => {
-            pickAirplane()
+            // 🎭 演示模式
+            if (demoMode) {
+                setIsLoading(false);
+
+                if (simulateLimitExceeded) {
+                    console.log("🎭 演示：模拟次数超限");
+                    setAirplaneContent(null);
+                    Toast.show({
+                        icon: "fail",
+                        content: "今日摘取次数已用完，明天再来吧～",
+                        duration: 2500,
+                    });
+                    setTimeout(() => navigate("/tree"), 3000);
+                    return;
+                } else {
+                    console.log("🎭 演示：正常获取纸飞机");
+                    setAirplaneContent("今天早八好困，但坚持住了！加油💪");
+                    Toast.show("纸飞机已打开！");
+                    return;
+                }
+            }
+
+            // 真实接口调用
+            setIsLoading(true);
+            getSolve()
                 .then((res) => {
-                    if (res.data.message === "暂无纸飞机") {
+                    setIsLoading(false);
+                    const data = res.data;
+
+                    // 检查是否超出每日次数限制
+                    if (data.limitExceeded || data.exceed || data.message?.includes("超出") || data.message?.includes("限制")) {
+                        setAirplaneContent(null);
+                        Toast.show({
+                            icon: "fail",
+                            content: data.message || "今日摘取次数已用完，明天再来吧～",
+                            duration: 2500,
+                        });
+                        // 3秒后返回心情树
+                        setTimeout(() => {
+                            navigate("/tree");
+                        }, 3000);
+                        return;
+                    }
+
+                    // 检查是否有纸飞机内容
+                    if (data.message === "暂无纸飞机" || !data.content) {
                         setAirplaneContent(null);
                         Toast.show("当前暂无新纸飞机，稍后再来试试吧～");
                     } else {
-                        setAirplaneContent(res.data.content);
+                        setAirplaneContent(data.content);
                         Toast.show("纸飞机已打开！");
                     }
                 })
-                .catch(() => {
-                    // Mock 数据兜底 - 模拟有别人的纸飞机
-                    const mockAirplanes = [
-                        "今天早八好困，但坚持住了！加油💪",
-                        "图书馆刷了一下午题，累但充实～希望大家考试都能过！",
-                        "食堂的红烧肉真的太好吃了！心情瞬间变好😋",
-                        "明天就要考试了，有点紧张，但我相信自己一定可以的！",
-                        "今天和朋友聊了很久，感觉压力释放了不少，谢谢陪伴❤️",
-                        "睡前复盘一下今天，虽然有些小遗憾，但明天继续努力！晚安🌙",
-                        "终于完成了小组作业，团队协作真的很重要！",
-                        "在操场跑了几圈，运动后心情好多了🏃",
-                    ];
-                    const randomContent = mockAirplanes[Math.floor(Math.random() * mockAirplanes.length)];
-                    setAirplaneContent(randomContent);
-                    Toast.show("纸飞机已打开！");
+                .catch((error) => {
+                    setIsLoading(false);
+                    console.error("获取纸飞机失败:", error);
+                    // 检查错误响应中是否包含次数限制信息
+                    const errorMsg = error.response?.data?.message || error.message || "";
+                    if (errorMsg.includes("超出") || errorMsg.includes("限制") || errorMsg.includes("次数")) {
+                        setAirplaneContent(null);
+                        Toast.show({
+                            icon: "fail",
+                            content: errorMsg || "今日摘取次数已用完，明天再来吧～",
+                            duration: 2500,
+                        });
+                        setTimeout(() => {
+                            navigate("/tree");
+                        }, 3000);
+                    } else {
+                        // Mock 数据兜底 - 模拟有别人的纸飞机
+                        const mockAirplanes = [
+                            "今天早八好困，但坚持住了！加油💪",
+                            "图书馆刷了一下午题，累但充实～希望大家考试都能过！",
+                            "食堂的红烧肉真的太好吃了！心情瞬间变好😋",
+                            "明天就要考试了，有点紧张，但我相信自己一定可以的！",
+                            "今天和朋友聊了很久，感觉压力释放了不少，谢谢陪伴❤️",
+                            "睡前复盘一下今天，虽然有些小遗憾，但明天继续努力！晚安🌙",
+                            "终于完成了小组作业，团队协作真的很重要！",
+                            "在操场跑了几圈，运动后心情好多了🏃",
+                        ];
+                        const randomContent = mockAirplanes[Math.floor(Math.random() * mockAirplanes.length)];
+                        setAirplaneContent(randomContent);
+                        Toast.show("纸飞机已打开！");
+                    }
                 });
         }, 800);
 
@@ -73,7 +138,7 @@ export default function AirplanePickPage() {
 
         setSending(true);
         try {
-            await publishAirplane(replyContent.trim());
+            await replyToAirplane(replyContent.trim());
             Toast.show({
                 icon: "success",
                 content: "回复已发送～",
@@ -110,7 +175,79 @@ export default function AirplanePickPage() {
                 </div>
             </div>
 
-            {airplaneContent ? (
+            {isLoading ? (
+                <div
+                    style={{
+                        maxWidth: 500,
+                        margin: "0 auto",
+                        background: "#ffffff",
+                        borderRadius: "20px",
+                        padding: "60px 40px",
+                        textAlign: "center",
+                        boxShadow: "0 8px 24px rgba(0,168,120,0.12)",
+                        border: "2px solid #d8f3dc",
+                    }}
+                >
+                    <div
+                        style={{
+                            marginBottom: 20,
+                            animation: "float 2s ease-in-out infinite",
+                        }}
+                    >
+                        <Icon icon="mingcute:send-plane-line" width="64" height="64" color="#00a878" />
+                    </div>
+                    <div style={{ fontSize: 18, color: "#00a878", fontWeight: 600, marginBottom: 8 }}>
+                        正在打开纸飞机
+                    </div>
+                    <div style={{ fontSize: 14, color: "#95d5b2" }}>
+                        请稍候...
+                    </div>
+                    <style>{`
+                        @keyframes float {
+                            0%, 100% { transform: translateY(0px); }
+                            50% { transform: translateY(-10px); }
+                        }
+                    `}</style>
+                </div>
+            ) : !airplaneContent ? (
+                <div
+                    style={{
+                        maxWidth: 500,
+                        margin: "0 auto",
+                        background: "#ffffff",
+                        borderRadius: "20px",
+                        padding: "60px 40px",
+                        textAlign: "center",
+                        boxShadow: "0 8px 24px rgba(0,168,120,0.12)",
+                        border: "2px solid #d8f3dc",
+                    }}
+                >
+                    <div style={{ marginBottom: 20, opacity: 0.6 }}>
+                        <Icon icon="mingcute:send-plane-line" width="64" height="64" color="#52b788" />
+                    </div>
+                    <div style={{ fontSize: 18, color: "#52b788", fontWeight: 600, marginBottom: 8 }}>
+                        暂无新纸飞机
+                    </div>
+                    <div style={{ fontSize: 14, color: "#95d5b2", marginBottom: 30 }}>
+                        稍后再来看看吧～
+                    </div>
+                    <Button
+                        color="primary"
+                        size="large"
+                        onClick={() => navigate("/tree")}
+                        style={{
+                            background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
+                            border: "none",
+                            borderRadius: 12,
+                            padding: "12px 40px",
+                            fontSize: 16,
+                            fontWeight: 600,
+                        }}
+                    >
+                        🌳 返回心情树
+                    </Button>
+                </div>
+            ) : airplaneContent ? (
                 <div
                     style={{
                         maxWidth: 500,
@@ -200,38 +337,7 @@ export default function AirplanePickPage() {
                         </Button>
                     </Space>
                 </div>
-            ) : (
-                <div
-                    style={{
-                        textAlign: "center",
-                        padding: "60px 20px",
-                        maxWidth: 400,
-                        margin: "0 auto",
-                    }}
-                >
-                    <div style={{ fontSize: 64, marginBottom: 20 }}>📭</div>
-                    <p style={{ fontSize: 18, color: "#666", marginBottom: 8 }}>
-                        当前暂无新纸飞机
-                    </p>
-                    <p style={{ fontSize: 14, color: "#999" }}>
-                        稍后再来试试吧～
-                    </p>
-                    <Button
-                        color="primary"
-                        size="large"
-                        onClick={() => navigate("/tree")}
-                        style={{
-                            marginTop: 30,
-                            background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
-                            border: "none",
-                            borderRadius: 12,
-                            padding: "12px 40px",
-                        }}
-                    >
-                        返回心情树
-                    </Button>
-                </div>
-            )}
+            ) : null}
 
             {/* 回复弹窗 */}
             <CenterPopup

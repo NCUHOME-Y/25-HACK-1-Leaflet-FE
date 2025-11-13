@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { TabBar } from "antd-mobile";
+import { Icon } from "@iconify/react";
 import { useLocation, useNavigate } from "react-router-dom";
+
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -51,22 +53,22 @@ export default function MainLayout({ children }: MainLayoutProps) {
         >
           <TabBar.Item
             key="/tree"
-            icon={<span style={{ fontSize: 20 }}>🌳</span>}
+            icon={<Icon icon="ri:seedling-line" width="24" height="24" />}
             title="心情树"
           />
           <TabBar.Item
             key="/record"
-            icon={<span style={{ fontSize: 20 }}>📝</span>}
+            icon={<Icon icon="solar:pen-outline" width="24" height="24" />}
             title="心情记录"
           />
           <TabBar.Item
             key="/encouragement"
-            icon={<span style={{ fontSize: 20 }}>💬</span>}
-            title="每日鼓励"
+            icon={<Icon icon="solar:star-outline" width="24" height="24" />}
+            title="鼓励语"
           />
           <TabBar.Item
             key="/my"
-            icon={<span style={{ fontSize: 20 }}>👤</span>}
+            icon={<Icon icon="solar:user-outline" width="24" height="24" />}
             title="我的"
           />
         </TabBar>

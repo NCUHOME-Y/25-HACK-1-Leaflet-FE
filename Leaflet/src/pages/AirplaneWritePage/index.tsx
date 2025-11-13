@@ -1,24 +1,33 @@
 import { useState } from 'react';
-import { Input, Button, Toast, Image } from 'antd-mobile';
+import { TextArea, Button, Toast, Image } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
+import { Icon } from '@iconify/react';
 import { publishAirplane } from '../../services/airplane.service';
 import airplaneFlyImg from '../../assets/images/airplane-fly.png';
 
 export default function AirplaneWritePage() {
   const navigate = useNavigate();
   const [content, setContent] = useState('');
+  const [isSending, setIsSending] = useState(false);
 
   const handlePublish = async () => {
     if (!content.trim()) {
-      Toast.show('请输入内容');
+      Toast.show({
+        icon: 'fail',
+        content: '请输入内容',
+      });
       return;
     }
     if (content.length > 200) {
-      Toast.show('字数不能超过200字');
+      Toast.show({
+        icon: 'fail',
+        content: '字数不能超过200字',
+      });
       return;
     }
 
     try {
+      setIsSending(true);
       await publishAirplane(content);
       // 显示“纸飞机已飞走～” + 静态图
       Toast.show({
@@ -31,34 +40,128 @@ export default function AirplaneWritePage() {
         navigate('/tree');
       }, 3000);
     } catch (error) {
+      setIsSending(false);
       // 假设后端返回 { error: "换个积极的表达吧～" }
-      Toast.show('换个积极的表达吧～');
+      Toast.show({
+        icon: 'fail',
+        content: '换个积极的表达吧～',
+      });
     }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h3>书写</h3>
-      <p style={{ fontSize: '14px', color: '#bac659ff' }}>写下你的感受，它会飞向远方</p>
-
-      <Input
-        placeholder="写下你的心情（200字内）"
-        value={content}
-        onChange={(value) => {
-          if (value.length <= 200) {
-            setContent(value);
-          }
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #e8f5f0 0%, #f0faf6 100%)',
+        padding: '20px',
+        paddingBottom: '80px',
+        boxSizing: 'border-box',
+        position: 'relative',
+      }}
+    >
+      {/* 返回按钮 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          cursor: 'pointer',
+          zIndex: 10,
         }}
-        maxLength={200}
-        style={{ marginBottom: '20px' }}
-      />
-      <div style={{ textAlign: 'right', fontSize: '12px', color: '#999', marginBottom: '20px' }}>
-        {content.length}/200
+        onClick={() => navigate(-1)}
+      >
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s',
+          }}
+        >
+          <Icon icon="solar:arrow-left-outline" width="20" height="20" color="#00a878" />
+        </div>
       </div>
 
-      <Button color="primary" block onClick={handlePublish}>
-        折成纸飞机
-      </Button>
+      {/* 顶部标题区 */}
+      <div style={{ textAlign: 'center', marginBottom: 32, marginTop: 20 }}>
+        <div style={{ marginBottom: 16 }}>
+          <Icon icon="ph:paper-plane-tilt-fill" width="48" height="48" color="#00a878" />
+        </div>
+        <h2 style={{ margin: 0, color: '#1a7f5a', fontSize: 26, fontWeight: 600, marginBottom: 8 }}>
+          书写纸飞机
+        </h2>
+        <p style={{ fontSize: 14, color: '#6aa893', margin: 0 }}>
+          写下你的感受，它会飞向远方
+        </p>
+      </div>
+
+      {/* 输入卡片 */}
+      <div
+        style={{
+          maxWidth: 500,
+          margin: '0 auto',
+          background: '#ffffff',
+          borderRadius: '20px',
+          padding: '24px',
+          boxShadow: '0 8px 24px rgba(0,168,120,0.12)',
+          border: '2px solid #d8f3dc',
+          marginBottom: 24,
+        }}
+      >
+        {/* 装饰标签 */}
+        <div
+          style={{
+            display: 'inline-block',
+            background: 'linear-gradient(135deg, #00a878 0%, #00c896 100%)',
+            color: 'white',
+            padding: '4px 12px',
+            borderRadius: '8px',
+            fontSize: 12,
+            fontWeight: 600,
+            marginBottom: 16,
+          }}
+        >
+          匿名分享
+        </div>
+
+        {/* 输入框 */}
+        <TextArea
+          placeholder="写下你的心情，可以是开心的事、烦恼、想法...&#10;&#10;你的文字会被折成纸飞机，飘向远方～"
+          value={content}
+          onChange={setContent}
+          maxLength={200}
+          rows={8}
+          showCount
+          style={{
+            '--font-size': '16px',
+            '--color': '#2b2b2b',
+            background: '#f8fcfa',
+            border: '1px solid #d8f3dc',
+            borderRadius: '12px',
+            padding: '12px',
+            lineHeight: '1.6',
+          }}
+        />
+
+        {/* 字数提示 */}
+        <div
+          style={{
+            textAlign: 'right',
+            fontSize: 12,
+            color: content.length > 180 ? '#ff6b6b' : '#95d5b2',
+            marginTop: 8,
+            fontWeight: 500,
+          }}
+        >
+          {content.length}/200 字
+        </div>
+      </div>
     </div>
   );
 }
