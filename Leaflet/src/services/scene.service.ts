@@ -11,10 +11,12 @@ export const getSceneStats = () => {
 };
 
 /**
- * 如果后端支持按场景查询，可使用此接口（可选）
+ * 获取指定标签的人数统计
+ * @param tagId 标签ID (1-9)
+ * @returns { count: number }
  */
-export const getSceneStatsByKey = (sceneKey: string) => {
-    return apiClient.get(`/status/by_tag/3/${sceneKey}`);
+export const getTagCount = (tagId: number) => {
+    return apiClient.get(`/status/by_tag/${tagId}`);
 };
 
 /**

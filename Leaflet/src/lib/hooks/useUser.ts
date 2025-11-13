@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import avatar1 from "../../assets/images/avatar/avatar-1.png";
+import { getUserLevel, getAllRecords } from "../../services/mind.service";
 
 // 用户信息类型定义
 export interface UserStats {
@@ -59,11 +60,92 @@ export const useUser = () => {
     const [user, setUser] = useState<User>(getUserFromStorage);
     const [loading, setLoading] = useState(true);
 
-    // 初始化时从localStorage加载用户信息
+    // 初始化时从localStorage加载用户信息，并从后端获取统计数据
     useEffect(() => {
         const storedUser = getUserFromStorage();
         setUser(storedUser);
-        setLoading(false);
+        
+        console.log('🚀 开始获取用户统计数据...');
+        
+        // 同时获取等级和记录数据
+        Promise.all([
+            getUserLevel()
+                .then(res => {
+                    console.log('✅ getUserLevel 成功');
+                    return res;
+                })
+                .catch(err => {
+                    console.error('❌ 获取用户等级失败:', err);
+                    return null;
+                }),
+            getAllRecords()
+                .then(res => {
+                    console.log('✅ getAllRecords 成功');
+                    return res;
+                })
+                .catch(err => {
+                    console.error('❌ 获取记录列表失败:', err);
+                    return null;
+                })
+        ])
+        .then(([levelRes, recordsRes]) => {
+            console.log('等级数据:', levelRes?.data);
+            console.log('记录数据:', recordsRes?.data);
+            
+            let treeLevel = storedUser.stats.treeLevel;
+            let totalRecords = storedUser.stats.totalRecords;
+            let consecutiveDays = storedUser.stats.consecutiveDays;
+            
+            // 解析等级数据
+            if (levelRes?.data) {
+                treeLevel = levelRes.data.level || treeLevel;
+                console.log('心情树等级 (level):', treeLevel);
+            }
+            
+            // 解析记录统计数据 - GET /status/mine 返回 { "status": [...] }
+            if (recordsRes?.data) {
+                const data = recordsRes.data;
+                console.log('统计数据对象:', data);
+                
+                // 从 status 数组中获取第一条记录的统计信息
+                let records = data.status || data.records || data.data || [];
+                console.log('记录数组:', records);
+                
+                if (Array.isArray(records) && records.length > 0) {
+                    const firstRecord = records[0];
+                    console.log('第一条记录:', firstRecord);
+                    
+                    // all_record_count - 总记录数
+                    if (firstRecord.all_record_count !== undefined) {
+                        totalRecords = firstRecord.all_record_count;
+                        console.log('总记录数 (all_record_count):', totalRecords);
+                    }
+                    
+                    // count - 连续记录天数
+                    if (firstRecord.count !== undefined) {
+                        consecutiveDays = firstRecord.count;
+                        console.log('连续记录天数 (count):', consecutiveDays);
+                    }
+                }
+            }
+            
+            console.log('最终统计数据:', { totalRecords, consecutiveDays, treeLevel });
+            
+            // 更新用户统计信息
+            const updatedUser = {
+                ...storedUser,
+                stats: {
+                    totalRecords,
+                    consecutiveDays,
+                    treeLevel,
+                }
+            };
+            setUser(updatedUser);
+            saveUserToStorage(updatedUser);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
     }, []);
 
     // 更新用户信息
