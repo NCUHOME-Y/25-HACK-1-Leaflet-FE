@@ -13,6 +13,18 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // 开发环境下打印请求信息，便于调试（不要在生产环境泄露 token）
+  try {
+    if (import.meta.env.DEV) {
+      console.debug('[apiClient] request', {
+        method: config.method,
+        url: config.baseURL ? config.baseURL + config.url : config.url,
+        headers: { ...(config.headers || {}) },
+      });
+    }
+  } catch (e) {
+    // ignore in environments without import.meta
+  }
   return config;
 });
 
@@ -20,7 +32,20 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
+    // 更详细的错误日志（开发环境）
+    const errData = error.response?.data || error.message;
+    console.error('API Error:', errData);
+    try {
+      if (import.meta.env.DEV) {
+        console.debug('[apiClient] response error', {
+          url: error.config?.url,
+          status: error.response?.status,
+          data: errData,
+        });
+      }
+    } catch (e) {
+      // ignore
+    }
     return Promise.reject(error);
   }
 );
