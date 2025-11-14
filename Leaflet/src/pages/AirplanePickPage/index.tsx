@@ -429,21 +429,6 @@ export default function AirplanePickPage() {
                         >
                             🔄 刷新摘取
                         </Button>
-                        <Button
-                            fill="outline"
-                            size="large"
-                            block
-                            onClick={() => navigate("/tree")}
-                            style={{
-                                borderColor: "#00a878",
-                                color: "#00a878",
-                                borderRadius: 12,
-                                padding: "12px 40px",
-                                fontSize: 16,
-                            }}
-                        >
-                            🌳 返回
-                        </Button>
                     </div>
                 </div>
             ) : airplaneContent ? (
