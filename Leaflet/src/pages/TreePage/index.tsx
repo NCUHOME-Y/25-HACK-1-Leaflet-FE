@@ -30,8 +30,17 @@ export default function TreePage() {
     useEffect(() => {
         getUserLevel()
             .then((res) => {
-                console.log("用户等级数据:", res.data);
-                setUserLevel(res.data);
+                const d: any = res?.data ?? {};
+                // 兼容不同字段命名与嵌套结构，保证 record_days 一定有值
+                const level = d.level ?? d.data?.level ?? 1;
+                const recordDays =
+                    d.record_days ??
+                    d.recordDays ??
+                    d.days ??
+                    d.data?.record_days ??
+                    0;
+                console.log("用户等级数据(规范化):", { level, recordDays });
+                setUserLevel({ level, record_days: recordDays });
             })
             .catch((err) => {
                 console.error("获取用户等级失败:", err);
@@ -98,7 +107,7 @@ export default function TreePage() {
             <div
                 style={{
                     textAlign: "center",
-                    marginBottom: 20,
+                    marginBottom: 6,
                     zIndex: 1,
                     position: "relative",
                 }}
@@ -117,8 +126,8 @@ export default function TreePage() {
                 <div
                     style={{
                         color: "#6aa893",
-                        marginTop: 6,
-                        fontSize: 14,
+                        marginTop: 0,
+                        fontSize: 10,
                         fontWeight: "500",
                     }}
                 >
@@ -138,7 +147,7 @@ export default function TreePage() {
                     width: "100%",
                     maxWidth: 400,
                     textAlign: "center",
-                    marginBottom: 24,
+                    marginBottom: 2,
                     border: "1px solid rgba(255,255,255,0.8)",
                     position: "relative",
                     zIndex: 1,
@@ -217,7 +226,7 @@ export default function TreePage() {
                     gap: 12,
                     width: "100%",
                     maxWidth: 400,
-                    height: 110,
+                    height: 100,
                 }}
             >
                 {/* 写纸折纸按钮 */}

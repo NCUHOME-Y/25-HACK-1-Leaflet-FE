@@ -45,8 +45,13 @@ export const pickAirplane = async () => {
 };
 
 // GET /solve - 获取情绪疏导（摘取纸飞机，包含次数限制检查）
-export const getSolve = () => {
-    return apiClient.get("/solve");
+export const getSolve = (params?: Record<string, any>) => {
+    return apiClient.get("/solve", { params });
+};
+
+// 仅获取“与当前用户相关”的回信（需要后端支持）
+export const getMySolves = () => {
+    return getSolve({ mine: 1 }); // 后端可按 token 识别用户，仅返回属于我的回信
 };
 
 // POST /solve - 上传情绪疏导（回复纸飞机）

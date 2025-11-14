@@ -16,13 +16,10 @@ export default function LoginPage() {
         setLoading(true);
         try {
             await login(id, password);
-            message.success("登录成功！正在跳转...");
-            setTimeout(() => {
-                // 检查是否有重定向路径，如果没有则默认跳转到 /record
-                const from =
-                    (location.state as any)?.from?.pathname || "/record";
-                navigate(from, { replace: true });
-            }, 100); // 0.8秒后跳转
+            message.success("登录成功！");
+            // 直接跳转，删除延时
+            const from = (location.state as any)?.from?.pathname || "/record";
+            navigate(from, { replace: true });
         } catch {
             message.error("登录失败，请重试");
         } finally {
@@ -36,10 +33,9 @@ export default function LoginPage() {
         setLoading(true);
         try {
             await register(id, password);
-            message.success("注册成功！正在跳转...");
-            setTimeout(() => {
-                navigate("/record", { replace: true });
-            }, 800); // 0.8秒后跳转
+            message.success("注册成功！");
+            // 直接跳转，删除延时
+            navigate("/record", { replace: true });
         } catch {
             message.error("注册失败，请重试");
         } finally {

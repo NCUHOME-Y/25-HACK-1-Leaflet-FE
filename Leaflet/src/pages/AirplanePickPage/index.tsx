@@ -107,9 +107,7 @@ export default function AirplanePickPage() {
                                 errorMsg || "今日摘取次数已用完，明天再来吧～",
                             duration: 2500,
                         });
-                        setTimeout(() => {
-                            navigate("/tree");
-                        }, 3000);
+                        // 删除自动延时跳转，用户自行点返回
                     } else {
                         // 显示错误信息
                         setAirplaneContent(null);
@@ -164,16 +162,39 @@ export default function AirplanePickPage() {
             };
             setComfortList((prev) => [newComfort, ...prev]);
 
+            // === 本地草稿缓存：用于在“他人回信”页立即显示（后端可能异步处理） ===
+            try {
+                const draftItem = {
+                    id: `draft-${Date.now()}`,
+                    problems: airplaneContent || "", // 当前摘取到的问题文本
+                    solution: replyContent.trim(),
+                    createdAt: new Date().toISOString(),
+                    source: "local-draft", // 标记来源
+                };
+                const existingRaw = localStorage.getItem("localSolvesDraft");
+                const existing: any[] = existingRaw
+                    ? JSON.parse(existingRaw)
+                    : [];
+                existing.unshift(draftItem);
+                localStorage.setItem(
+                    "localSolvesDraft",
+                    JSON.stringify(existing.slice(0, 50))
+                ); // 限制最大缓存数量
+                console.log(
+                    "📝 已保存本地回信草稿到 localSolvesDraft:",
+                    draftItem
+                );
+            } catch (e) {
+                console.warn("⚠️ 保存本地回信草稿失败:", e);
+            }
+
             Toast.show({
                 icon: "success",
                 content: "回复已发送～",
             });
             setReplyVisible(false);
             setReplyContent("");
-            // 1秒后返回心情树
-            setTimeout(() => {
-                navigate("/tree");
-            }, 1000);
+            // 删除延时自动跳转，保留本地缓存，用户可手动前往查看
         } catch (error: any) {
             console.error("❌ 发送回复失败:", error);
             console.error("❌ 错误详情:", {

@@ -3,13 +3,14 @@ import { Navigate } from "react-router-dom";
 // 页面组件
 import LoginPage from "../pages/LoginPage";
 // 心情记录相关页面
-import MoodrecordPage from "../pages/MoodrecordPage"; // 场景选择九宫格
+import MoodrecordPage from "../pages/moodrecordPage"; // 场景选择九宫格
 import RecordPage from "../pages/RecordPage"; // 所有记录列表
 import SceneRecordPage from "../pages/SceneRecordPage"; // 场景记录详情
 import TreePage from "../pages/TreePage";
 import AirplaneWritePage from "../pages/AirplaneWritePage";
 import AirplanePickPage from "../pages/AirplanePickPage";
 import EncouragementPage from "../pages/EncouragementPage";
+import SolveReplyPage from "../pages/SolveReplyPage";
 import MyPage from "../pages/MyPage";
 
 // Layout 组件
@@ -20,66 +21,100 @@ import MainLayout from "../components/layout/MainLayout";
 // 后期补登录时再启用 ProtectedRoute
 
 export const routes = [
-  // 登录页（游客可跳过）
-  {
-    path: "/",
-    element: <LoginPage />,
-    name: "登录",
-  },
-  // 心情记录 - 场景选择九宫格（P0 核心）
-  {
-    path: "/record",
-    element: <MainLayout><MoodrecordPage /></MainLayout>,
-    name: "心情记录",
-  },
-  // 所有记录列表（从"我的"页面跳转过来）
-  {
-    path: "/record/history",
-    element: <MainLayout><RecordPage /></MainLayout>,
-    name: "个人心情档案",
-  },
-  // 心情树主页（P0 核心入口）
-  {
-    path: "/tree",
-    element: <MainLayout><TreePage /></MainLayout>,
-    name: "心情树",
-  },
-  // 写纸折纸（P0）
-  {
-    path: "/airplane/write",
-    element: <AirplaneWritePage />,
-    name: "写纸折纸",
-  },
-  // 捞取纸飞机（P0）
-  {
-    path: "/airplane/pick",
-    element: <AirplanePickPage />,
-    name: "捞取纸飞机",
-  },
-  // 场景记录页面
-  {
-    path: "/record/scene",
-    element: <MainLayout><SceneRecordPage /></MainLayout>,
-    name: "场景记录",
-  },
-  // 鼓励语
-  {
-    path: "/encouragement",
-    element: <MainLayout><EncouragementPage /></MainLayout>,
-    name: "每日鼓励",
-  },
-  // 我的
-  {
-    path: "/my",
-    element: <MainLayout><MyPage /></MainLayout>,
-    name: "我的",
-  },
-  // 兜底重定向
-  {
-    path: "*",
-    element: <Navigate to="/" replace />,
-    name: "重定向",
-  },
+    // 登录页（游客可跳过）
+    {
+        path: "/",
+        element: <LoginPage />,
+        name: "登录",
+    },
+    // 心情记录 - 场景选择九宫格（P0 核心）
+    {
+        path: "/record",
+        element: (
+            <MainLayout>
+                <MoodrecordPage />
+            </MainLayout>
+        ),
+        name: "心情记录",
+    },
+    // 所有记录列表（从"我的"页面跳转过来）
+    {
+        path: "/record/history",
+        element: (
+            <MainLayout>
+                <RecordPage />
+            </MainLayout>
+        ),
+        name: "个人心情档案",
+    },
+    // 心情树主页（P0 核心入口）
+    {
+        path: "/tree",
+        element: (
+            <MainLayout>
+                <TreePage />
+            </MainLayout>
+        ),
+        name: "心情树",
+    },
+    // 写纸折纸（P0）
+    {
+        path: "/airplane/write",
+        element: <AirplaneWritePage />,
+        name: "写纸折纸",
+    },
+    // 捞取纸飞机（P0）
+    {
+        path: "/airplane/pick",
+        element: <AirplanePickPage />,
+        name: "捞取纸飞机",
+    },
+    // 场景记录页面
+    {
+        path: "/record/scene",
+        element: (
+            <MainLayout>
+                <SceneRecordPage />
+            </MainLayout>
+        ),
+        name: "场景记录",
+    },
+    // 鼓励语
+    {
+        path: "/encouragement",
+        element: (
+            <MainLayout>
+                <EncouragementPage />
+            </MainLayout>
+        ),
+        name: "每日鼓励",
+    },
+    // 他人回信（/solve 列表）
+    {
+        path: "/solve-replies",
+        element: (
+            <MainLayout>
+                <SolveReplyPage />
+            </MainLayout>
+        ),
+        name: "他人回信",
+    },
+    // 我的
+    {
+        path: "/my",
+        element: (
+            <MainLayout>
+                <MyPage />
+            </MainLayout>
+        ),
+        name: "我的",
+    },
+    // 兜底重定向
+    {
+        path: "*",
+        element: <Navigate to="/" replace />,
+        name: "重定向",
+    },
 ];
 
 export default routes;
