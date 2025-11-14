@@ -62,14 +62,16 @@ export default function AirplaneWritePage() {
                     />
                 ),
             });
-            // 删除自动延迟跳转，用户自行返回
+            // 发送成功后返回心情树
+            navigate("/tree", { replace: true });
         } catch (error) {
-            setIsSending(false);
             // 假设后端返回 { error: "换个积极的表达吧～" }
             Toast.show({
                 icon: "fail",
                 content: "换个积极的表达吧～",
             });
+        } finally {
+            setIsSending(false);
         }
     };
 

@@ -21,3 +21,120 @@ body {
     transform: translateX(-50%) !important;
     margin: 0 auto !important;
 }
+
+/* === 场景选择卡片布局优化 === */
+.scene-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    padding: 8px 4px 90px; /* 预留底部导航空间 */
+    box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+    .scene-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 18px;
+    }
+}
+
+@media (min-width: 760px) {
+    .scene-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 760px;
+        margin: 0 auto;
+        gap: 20px;
+    }
+}
+
+.scene-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 18px 16px 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.25s, transform 0.25s;
+    min-height: 128px;
+}
+
+.scene-card:hover {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.scene-emoji-wrapper {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e9fbf3 0%, #f4fffa 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 168, 120, 0.18);
+}
+
+.scene-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2b2b2b;
+    line-height: 1.4;
+    margin: 0 0 6px;
+    word-break: break-word;
+}
+
+.scene-count {
+    font-size: 12px;
+    color: #00a878;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    background: #edfff5;
+    padding: 4px 10px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px #d8f3dc;
+}
+
+.scene-card:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 允许某些页面在移动端滚动 */
+.allow-scroll {
+    height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 超小屏（手机）优化：单列显示，压缩内边距与卡片高度 */
+@media (max-width: 420px) {
+    .scene-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 12px 8px 90px;
+    }
+    .scene-card {
+        min-height: 112px;
+        padding: 16px 14px 18px;
+    }
+    .scene-emoji-wrapper {
+        width: 48px;
+        height: 48px;
+        font-size: 26px;
+        margin-bottom: 10px;
+        box-shadow: 0 3px 10px rgba(0, 168, 120, 0.15);
+    }
+    .scene-title {
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+    .scene-count {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}

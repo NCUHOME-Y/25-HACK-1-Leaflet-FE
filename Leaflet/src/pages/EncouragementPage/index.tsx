@@ -29,6 +29,28 @@ export default function EncouragementPage() {
         } finally {
             setIsLoading(false);
         }
+        if ((window as any).umami) {
+            (window as any).umami.track("获取鼓励语");
+        } else {
+            window.addEventListener(
+                "umami:ready",
+                () => {
+                    (window as any).umami?.track("获取鼓励语");
+                },
+                { once: true }
+            );
+        }
+        if ((window as any).umami) {
+            (window as any).umami.track("获取鼓励语");
+        } else {
+            window.addEventListener(
+                "umami:ready",
+                () => {
+                    (window as any).umami?.track("获取鼓励语");
+                },
+                { once: true }
+            );
+        }
     };
 
     return (

@@ -52,6 +52,17 @@ export default function TreePage() {
     // "写纸折纸"按钮点击
     const handleWrite = () => {
         navigate("/airplane/write");
+        if ((window as any).umami) {
+            (window as any).umami.track("写纸折纸");
+        } else {
+            window.addEventListener(
+                "umami:ready",
+                () => {
+                    (window as any).umami?.track("写纸折纸");
+                },
+                { once: true }
+            );
+        }
     };
 
     // "摘纸飞机"按钮点击
@@ -61,6 +72,17 @@ export default function TreePage() {
             return;
         }
         navigate("/airplane/pick");
+        if ((window as any).umami) {
+            (window as any).umami.track("摘纸飞机");
+        } else {
+            window.addEventListener(
+                "umami:ready",
+                () => {
+                    (window as any).umami?.track("摘纸飞机");
+                },
+                { once: true }
+            );
+        }
     };
 
     return (

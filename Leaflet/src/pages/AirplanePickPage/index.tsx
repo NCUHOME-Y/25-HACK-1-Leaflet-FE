@@ -124,6 +124,17 @@ export default function AirplanePickPage() {
 
     const handleReply = () => {
         setReplyVisible(true);
+        if ((window as any).umami) {
+            (window as any).umami.track("回复纸飞机");
+        } else {
+            window.addEventListener(
+                "umami:ready",
+                () => {
+                    (window as any).umami?.track("回复纸飞机");
+                },
+                { once: true }
+            );
+        }
     };
 
     const handleSendReply = async () => {
@@ -206,6 +217,17 @@ export default function AirplanePickPage() {
             Toast.show("发送失败，请重试");
         } finally {
             setSending(false);
+        }
+        if ((window as any).umami) {
+            (window as any).umami.track("发送回复纸飞机");
+        } else {
+            window.addEventListener(
+                "umami:ready",
+                () => {
+                    (window as any).umami?.track("发送回复纸飞机");
+                },
+                { once: true }
+            );
         }
     };
 

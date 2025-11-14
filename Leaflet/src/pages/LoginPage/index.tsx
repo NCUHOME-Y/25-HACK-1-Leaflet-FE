@@ -25,6 +25,17 @@ export default function LoginPage() {
         } finally {
             setLoading(false);
         }
+        if ((window as any).umami) {
+            (window as any).umami.track("登录");
+        } else {
+            window.addEventListener(
+                "umami:ready",
+                () => {
+                    (window as any).umami?.track("登录");
+                },
+                { once: true }
+            );
+        }
     };
 
     const handleRegister = async () => {
