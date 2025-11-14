@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
-import { Button, Toast, Image, Space, CenterPopup, TextArea } from "antd-mobile";
+import {
+    Button,
+    Toast,
+    Image,
+    Space,
+    CenterPopup,
+    TextArea,
+} from "antd-mobile";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import { getSolve, replyToAirplane } from "../../services/airplane.service";
+import { pickAirplane, replyToAirplane } from "../../services/airplane.service";
 import airplanePickImg from "../../assets/images/airplane-pick.png";
 
 interface ComfortMessage {
@@ -13,10 +20,12 @@ interface ComfortMessage {
 export default function AirplanePickPage() {
     const navigate = useNavigate();
     const [airplaneContent, setAirplaneContent] = useState<string | null>(null);
+    const [problemId, setProblemId] = useState<number | null>(null); // 保存问题ID
     const [isLoading, setIsLoading] = useState(true); // 添加加载状态
     const [replyVisible, setReplyVisible] = useState(false);
     const [replyContent, setReplyContent] = useState("");
     const [sending, setSending] = useState(false);
+    const [records, setRecords] = useState<string[]>([]); // 本地记录（已获取的纸飞机）
     const [comfortList, setComfortList] = useState<ComfortMessage[]>([]); // 收到的安慰列表
 
     useEffect(() => {
@@ -34,56 +43,68 @@ export default function AirplanePickPage() {
 
         // 0.8秒后调用获取情绪疏导接口
         const timer = setTimeout(() => {
-
             // 真实接口调用
             setIsLoading(true);
-            getSolve()
+            pickAirplane()
                 .then((res) => {
+                    console.log("✅ pickAirplane 成功，完整响应:", res);
                     setIsLoading(false);
-                    const data = res.data;
+                    const data = res; // 直接使用响应对象
+                    console.log("✅ 实际数据:", data);
+                    console.log("✅ data.raw:", data.raw);
+                    console.log(
+                        "✅ data.raw?.problem?.context:",
+                        data.raw?.problem?.context
+                    );
 
-                    // 检查是否超出每日次数限制
-                    if (data.limitExceeded || data.exceed || data.message?.includes("超出") || data.message?.includes("限制")) {
+                    // 从 raw.problem.context 获取内容
+                    const airplaneText = data.raw?.problem?.context;
+                    const id = data.raw?.problem?.ID; // 获取问题ID（注意是大写ID）
+                    console.log("📝 提取的问题ID:", id);
+                    console.log("📝 提取的内容:", airplaneText);
+
+                    // 检查状态码和内容
+                    if (!airplaneText || data.status !== 200) {
                         setAirplaneContent(null);
-                        Toast.show({
-                            icon: "fail",
-                            content: data.message || "今日摘取次数已用完，明天再来吧～",
-                            duration: 2500,
-                        });
-                        // 3秒后返回心情树
-                        setTimeout(() => {
-                            navigate("/tree");
-                        }, 3000);
+                        Toast.show("当前暂无新纸飞机，稍后再来试试吧～");
                         return;
                     }
 
-                    // 检查是否有纸飞机内容
-                    if (data.message === "暂无纸飞机" || !data.content) {
-                        setAirplaneContent(null);
-                        Toast.show("当前暂无新纸飞机，稍后再来试试吧～");
-                    } else {
-                        setAirplaneContent(data.content);
-                        // 如果后端返回了安慰信息，添加到列表
-                        if (data.comfort) {
-                            const newComfort: ComfortMessage = {
-                                content: data.comfort,
-                                timestamp: new Date().toISOString(),
-                            };
-                            setComfortList(prev => [newComfort, ...prev]);
-                        }
-                        Toast.show("纸飞机已打开！");
+                    setAirplaneContent(airplaneText);
+                    setProblemId(id); // 保存问题ID
+                    // 将获取到的纸飞机加入本地记录
+                    if (
+                        typeof airplaneText === "string" &&
+                        airplaneText.trim()
+                    ) {
+                        setRecords((prev) => [airplaneText, ...prev]);
                     }
+                    // 如果后端返回了安慰信息，添加到列表
+                    if (data.comfort) {
+                        const newComfort: ComfortMessage = {
+                            content: data.comfort,
+                            timestamp: new Date().toISOString(),
+                        };
+                        setComfortList((prev) => [newComfort, ...prev]);
+                    }
+                    Toast.show("纸飞机已打开！");
                 })
                 .catch((error) => {
                     setIsLoading(false);
                     console.error("获取纸飞机失败:", error);
                     // 检查错误响应中是否包含次数限制信息
-                    const errorMsg = error.response?.data?.message || error.message || "";
-                    if (errorMsg.includes("超出") || errorMsg.includes("限制") || errorMsg.includes("次数")) {
+                    const errorMsg =
+                        error.response?.data?.message || error.message || "";
+                    if (
+                        errorMsg.includes("超出") ||
+                        errorMsg.includes("限制") ||
+                        errorMsg.includes("次数")
+                    ) {
                         setAirplaneContent(null);
                         Toast.show({
                             icon: "fail",
-                            content: errorMsg || "今日摘取次数已用完，明天再来吧～",
+                            content:
+                                errorMsg || "今日摘取次数已用完，明天再来吧～",
                             duration: 2500,
                         });
                         setTimeout(() => {
@@ -108,6 +129,10 @@ export default function AirplanePickPage() {
     };
 
     const handleSendReply = async () => {
+        console.log("🚀 开始发送回复");
+        console.log("🚀 当前 problemId:", problemId);
+        console.log("🚀 回复内容:", replyContent.trim());
+
         if (!replyContent.trim()) {
             Toast.show("请输入回复内容");
             return;
@@ -116,16 +141,28 @@ export default function AirplanePickPage() {
             Toast.show("回复内容不能超过100字");
             return;
         }
+        if (!problemId) {
+            console.error("❌ problemId 为空");
+            Toast.show("无法获取问题ID，请刷新后重试");
+            return;
+        }
 
         setSending(true);
         try {
-            await replyToAirplane(replyContent.trim());
+            console.log(
+                `🚀 调用 replyToAirplane(${problemId}, "${replyContent.trim()}")`
+            );
+            const response = await replyToAirplane(
+                problemId,
+                replyContent.trim()
+            );
+            console.log("✅ 回复成功，响应:", response);
             // 将发送的回复添加到安慰列表
             const newComfort: ComfortMessage = {
                 content: replyContent.trim(),
                 timestamp: new Date().toISOString(),
             };
-            setComfortList(prev => [newComfort, ...prev]);
+            setComfortList((prev) => [newComfort, ...prev]);
 
             Toast.show({
                 icon: "success",
@@ -137,11 +174,64 @@ export default function AirplanePickPage() {
             setTimeout(() => {
                 navigate("/tree");
             }, 1000);
-        } catch (error) {
-            console.error("发送回复失败:", error);
+        } catch (error: any) {
+            console.error("❌ 发送回复失败:", error);
+            console.error("❌ 错误详情:", {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+                config: error.config,
+            });
             Toast.show("发送失败，请重试");
         } finally {
             setSending(false);
+        }
+    };
+
+    // 手动刷新/摘取纸飞机（用于页面按钮）
+    const fetchPaper = async () => {
+        setIsLoading(true);
+        try {
+            const res = await pickAirplane();
+            console.log("🔄 手动刷新成功，完整响应:", res);
+            setIsLoading(false);
+            const data = res; // 直接使用响应对象
+            console.log("🔄 实际数据:", data);
+            console.log(
+                "🔄 data.raw?.problem?.context:",
+                data.raw?.problem?.context
+            );
+
+            // 从 raw.problem.context 获取内容
+            const airplaneText = data.raw?.problem?.context;
+            const id = data.raw?.problem?.ID; // 获取问题ID（注意是大写ID）
+            console.log("🔄 手动刷新 - 提取的问题ID:", id);
+            console.log("🔄 手动刷新 - 提取的内容:", airplaneText);
+
+            // 检查状态码和内容
+            if (!airplaneText || data.status !== 200) {
+                setAirplaneContent(null);
+                Toast.show("当前暂无新纸飞机，稍后再来试试吧～");
+                return;
+            }
+
+            setAirplaneContent(airplaneText);
+            setProblemId(id); // 保存问题ID
+            if (typeof airplaneText === "string" && airplaneText.trim()) {
+                setRecords((prev) => [airplaneText, ...prev]);
+            }
+            if (data.comfort) {
+                const newComfort: ComfortMessage = {
+                    content: data.comfort,
+                    timestamp: new Date().toISOString(),
+                };
+                setComfortList((prev) => [newComfort, ...prev]);
+            }
+            Toast.show("纸飞机已打开！");
+        } catch (error) {
+            setIsLoading(false);
+            console.error("手动摘取失败:", error);
+            Toast.show({ icon: "fail", content: "摘取失败，请稍后重试" });
         }
     };
 
@@ -154,13 +244,42 @@ export default function AirplanePickPage() {
                 boxSizing: "border-box",
             }}
         >
+            {/* 返回心情树 按钮（手动返回，替代自动跳转） */}
+            <div
+                style={{
+                    position: "absolute",
+                    top: 20,
+                    left: 20,
+                    cursor: "pointer",
+                    zIndex: 20,
+                }}
+                onClick={() => navigate("/tree")}
+            >
+                <div
+                    style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        background: "rgba(255,255,255,0.95)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxShadow: "0 6px 20px rgba(0,168,120,0.12)",
+                        transition: "all 0.2s",
+                    }}
+                >
+                    <Icon
+                        icon="solar:arrow-left-outline"
+                        width="20"
+                        height="20"
+                        color="#00a878"
+                    />
+                </div>
+            </div>
             <div style={{ textAlign: "center", marginBottom: 24 }}>
                 <h2 style={{ margin: 0, color: "#1a7f5a", fontSize: 24 }}>
                     ✉️ 摘取纸飞机
                 </h2>
-                <div style={{ color: "#6aa893", fontSize: 14, marginTop: 8 }}>
-                    看看别人分享的心情～
-                </div>
             </div>
 
             {isLoading ? (
@@ -182,9 +301,21 @@ export default function AirplanePickPage() {
                             animation: "float 2s ease-in-out infinite",
                         }}
                     >
-                        <Icon icon="mingcute:send-plane-line" width="64" height="64" color="#00a878" />
+                        <Icon
+                            icon="mingcute:send-plane-line"
+                            width="64"
+                            height="64"
+                            color="#00a878"
+                        />
                     </div>
-                    <div style={{ fontSize: 18, color: "#00a878", fontWeight: 600, marginBottom: 8 }}>
+                    <div
+                        style={{
+                            fontSize: 18,
+                            color: "#00a878",
+                            fontWeight: 600,
+                            marginBottom: 8,
+                        }}
+                    >
                         正在打开纸飞机
                     </div>
                     <div style={{ fontSize: 14, color: "#95d5b2" }}>
@@ -211,12 +342,30 @@ export default function AirplanePickPage() {
                     }}
                 >
                     <div style={{ marginBottom: 20, opacity: 0.6 }}>
-                        <Icon icon="mingcute:send-plane-line" width="64" height="64" color="#52b788" />
+                        <Icon
+                            icon="mingcute:send-plane-line"
+                            width="64"
+                            height="64"
+                            color="#52b788"
+                        />
                     </div>
-                    <div style={{ fontSize: 18, color: "#52b788", fontWeight: 600, marginBottom: 8 }}>
+                    <div
+                        style={{
+                            fontSize: 18,
+                            color: "#52b788",
+                            fontWeight: 600,
+                            marginBottom: 8,
+                        }}
+                    >
                         暂无新纸飞机
                     </div>
-                    <div style={{ fontSize: 14, color: "#95d5b2", marginBottom: 30 }}>
+                    <div
+                        style={{
+                            fontSize: 14,
+                            color: "#95d5b2",
+                            marginBottom: 30,
+                        }}
+                    >
                         稍后再来看看吧～
                     </div>
                     <div style={{ display: "flex", gap: "12px" }}>
@@ -224,9 +373,10 @@ export default function AirplanePickPage() {
                             color="primary"
                             size="large"
                             block
-                            onClick={() => window.location.reload()}
+                            onClick={fetchPaper}
                             style={{
-                                background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
+                                background:
+                                    "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
                                 border: "none",
                                 borderRadius: 12,
                                 padding: "12px 40px",
@@ -276,7 +426,8 @@ export default function AirplanePickPage() {
                                 position: "absolute",
                                 top: -12,
                                 right: 20,
-                                background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
+                                background:
+                                    "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
                                 color: "white",
                                 padding: "6px 16px",
                                 borderRadius: "12px",
@@ -293,9 +444,7 @@ export default function AirplanePickPage() {
                                 textAlign: "center",
                                 marginBottom: 16,
                             }}
-                        >
-
-                        </div>
+                        ></div>
                         <p
                             style={{
                                 fontSize: 16,
@@ -309,6 +458,53 @@ export default function AirplanePickPage() {
                         </p>
                     </div>
 
+                    {/* 本地记录区：显示已获取的历史记录（最新在前） */}
+                    {records.length > 0 && (
+                        <div style={{ maxWidth: 500, margin: "0 auto 16px" }}>
+                            <div
+                                style={{
+                                    fontSize: 14,
+                                    color: "#6aa893",
+                                    fontWeight: 600,
+                                    marginBottom: 8,
+                                }}
+                            >
+                                🗂 已保存记录
+                            </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 10,
+                                }}
+                            >
+                                {records.map((r, idx) => (
+                                    <div
+                                        key={idx}
+                                        style={{
+                                            background: "#fff",
+                                            border: "1px solid #e6f3ea",
+                                            padding: 12,
+                                            borderRadius: 10,
+                                            boxShadow:
+                                                "0 4px 12px rgba(0,168,120,0.06)",
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                fontSize: 14,
+                                                color: "#2b2b2b",
+                                                lineHeight: 1.6,
+                                            }}
+                                        >
+                                            {r}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <Space direction="vertical" block style={{ width: "100%" }}>
                         <Button
                             color="primary"
@@ -316,7 +512,8 @@ export default function AirplanePickPage() {
                             block
                             onClick={handleReply}
                             style={{
-                                background: "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
+                                background:
+                                    "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
                                 border: "none",
                                 borderRadius: 12,
                                 height: 48,
@@ -330,7 +527,7 @@ export default function AirplanePickPage() {
                             fill="outline"
                             size="large"
                             block
-                            onClick={() => window.location.reload()}
+                            onClick={fetchPaper}
                             style={{
                                 borderColor: "#00a878",
                                 color: "#00a878",
@@ -357,7 +554,13 @@ export default function AirplanePickPage() {
                             >
                                 💚 远方的慰藉
                             </div>
-                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 12,
+                                }}
+                            >
                                 {comfortList.map((comfort, index) => (
                                     <div
                                         key={index}
@@ -366,7 +569,8 @@ export default function AirplanePickPage() {
                                             border: "1px solid #d8f3dc",
                                             borderRadius: "12px",
                                             padding: "16px",
-                                            boxShadow: "0 2px 8px rgba(0,168,120,0.08)",
+                                            boxShadow:
+                                                "0 2px 8px rgba(0,168,120,0.08)",
                                         }}
                                     >
                                         <div
@@ -386,11 +590,13 @@ export default function AirplanePickPage() {
                                                 textAlign: "right",
                                             }}
                                         >
-                                            {new Date(comfort.timestamp).toLocaleString('zh-CN', {
-                                                month: '2-digit',
-                                                day: '2-digit',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
+                                            {new Date(
+                                                comfort.timestamp
+                                            ).toLocaleString("zh-CN", {
+                                                month: "2-digit",
+                                                day: "2-digit",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
                                             })}
                                         </div>
                                     </div>
@@ -414,12 +620,19 @@ export default function AirplanePickPage() {
                     boxShadow: "0 12px 48px rgba(0,168,120,0.2)",
                 }}
             >
-                <div style={{ position: "relative", overflow: "hidden", borderRadius: "20px" }}>
+                <div
+                    style={{
+                        position: "relative",
+                        overflow: "hidden",
+                        borderRadius: "20px",
+                    }}
+                >
                     {/* 顶部装饰渐变条 */}
                     <div
                         style={{
                             height: "6px",
-                            background: "linear-gradient(90deg, #00a878 0%, #00c896 50%, #00d4b8 100%)",
+                            background:
+                                "linear-gradient(90deg, #00a878 0%, #00c896 50%, #00d4b8 100%)",
                         }}
                     />
 
@@ -448,7 +661,8 @@ export default function AirplanePickPage() {
                                 e.currentTarget.style.color = "#666";
                             }}
                             onMouseLeave={(e) => {
-                                e.currentTarget.style.background = "transparent";
+                                e.currentTarget.style.background =
+                                    "transparent";
                                 e.currentTarget.style.color = "#bbb";
                             }}
                         >
@@ -493,7 +707,8 @@ export default function AirplanePickPage() {
                                 rows={5}
                                 showCount
                                 style={{
-                                    background: "linear-gradient(135deg, #f6fffb 0%, #fafffe 100%)",
+                                    background:
+                                        "linear-gradient(135deg, #f6fffb 0%, #fafffe 100%)",
                                     borderRadius: 12,
                                     border: "2px solid #d8f3dc",
                                     fontSize: 15,
