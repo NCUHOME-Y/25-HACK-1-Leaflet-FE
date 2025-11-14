@@ -458,6 +458,40 @@ export default function AirplanePickPage() {
                         </p>
                     </div>
 
+                    <Space direction="vertical" block style={{ width: "100%" }}>
+                        <Button
+                            color="primary"
+                            size="large"
+                            block
+                            onClick={handleReply}
+                            style={{
+                                background:
+                                    "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
+                                border: "none",
+                                borderRadius: 12,
+                                height: 48,
+                                fontSize: 16,
+                                fontWeight: 600,
+                            }}
+                        >
+                            💬 回复 TA
+                        </Button>
+                        <Button
+                            fill="outline"
+                            size="large"
+                            block
+                            onClick={fetchPaper}
+                            style={{
+                                borderColor: "#00a878",
+                                color: "#00a878",
+                                borderRadius: 12,
+                                height: 48,
+                                fontSize: 16,
+                            }}
+                        >
+                            🔄 刷新
+                        </Button>
+                    </Space>
                     {/* 本地记录区：显示已获取的历史记录（最新在前） */}
                     {records.length > 0 && (
                         <div style={{ maxWidth: 500, margin: "0 auto 16px" }}>
@@ -504,41 +538,6 @@ export default function AirplanePickPage() {
                             </div>
                         </div>
                     )}
-
-                    <Space direction="vertical" block style={{ width: "100%" }}>
-                        <Button
-                            color="primary"
-                            size="large"
-                            block
-                            onClick={handleReply}
-                            style={{
-                                background:
-                                    "linear-gradient(135deg, #00a878 0%, #00c896 100%)",
-                                border: "none",
-                                borderRadius: 12,
-                                height: 48,
-                                fontSize: 16,
-                                fontWeight: 600,
-                            }}
-                        >
-                            💬 回复 TA
-                        </Button>
-                        <Button
-                            fill="outline"
-                            size="large"
-                            block
-                            onClick={fetchPaper}
-                            style={{
-                                borderColor: "#00a878",
-                                color: "#00a878",
-                                borderRadius: 12,
-                                height: 48,
-                                fontSize: 16,
-                            }}
-                        >
-                            🔄 刷新
-                        </Button>
-                    </Space>
 
                     {/* 收到的安慰列表 */}
                     {comfortList.length > 0 && (
