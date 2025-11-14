@@ -224,9 +224,7 @@ export default function TreePage() {
                         color: "#2b2b2b",
                         marginBottom: 8,
                     }}
-                >
-                    已记录 {userLevel.record_days} 天
-                </div>
+                ></div>
                 <div
                     style={{
                         color: "#00a878",
