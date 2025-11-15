@@ -22,6 +22,7 @@ jobs:
 
       - name: Build dist
         run: |
+          corepack enable
           cd Leaflet
           pnpm i
           pnpm build
