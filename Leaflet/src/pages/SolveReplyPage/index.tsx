@@ -13,15 +13,39 @@ interface ReplyItem {
 }
 
 function normalizeSolveData(raw: any): ReplyItem[] {
-    if (!raw || typeof raw !== "object" || !Array.isArray(raw.solves))
+    if (!raw) return [];
+
+    const pickArray = (o: any): any[] => {
+        if (!o) return [];
+        if (Array.isArray(o)) return o;
+        if (Array.isArray(o.solves)) return o.solves;
+        if (o.data) {
+            if (Array.isArray(o.data)) return o.data;
+            if (Array.isArray(o.data?.solves)) return o.data.solves;
+            if (Array.isArray(o.data?.list)) return o.data.list;
+            if (Array.isArray(o.data?.items)) return o.data.items;
+        }
+        if (Array.isArray(o.list)) return o.list;
+        if (Array.isArray(o.items)) return o.items;
+        if (Array.isArray(o.solutions)) return o.solutions;
         return [];
-    return raw.solves
+    };
+
+    const arr = pickArray(raw);
+    return arr
         .map((s: any, idx: number) => ({
-            id: s.ID || s.id || idx,
-            solution: String(s.solution || s.reply || s.answer || ""),
-            createdAt: s.CreatedAt || s.created_at || undefined,
-            problemId: s.problem_id || s.problemId || undefined,
-            userId: s.user_id || s.userId || undefined,
+            id: s.ID || s.id || s.solve_id || idx,
+            solution: String(
+                s.solution ?? s.reply ?? s.answer ?? s.content ?? ""
+            ),
+            createdAt:
+                s.CreatedAt ||
+                s.created_at ||
+                s.createdAt ||
+                s.time ||
+                s.timestamp,
+            problemId: s.problem_id || s.problemId || s.pid || s.problemID,
+            userId: s.user_id || s.userId || s.uid,
         }))
         .filter((r: ReplyItem) => r.solution !== "");
 }
