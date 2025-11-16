@@ -57,7 +57,7 @@ export default function LoginPage() {
     return (
         <div style={{ padding: "40px", textAlign: "center" }}>
             <h2>🌿 Leaflet 登录</h2>
-            <p>输入你的用户ID即可快速进入</p>
+            <p>输入用户名和密码注册后即可登录</p>
             <Input
                 placeholder="请输入ID"
                 value={id}
