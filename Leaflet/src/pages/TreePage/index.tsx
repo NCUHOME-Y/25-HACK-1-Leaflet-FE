@@ -278,10 +278,15 @@ export default function TreePage() {
                     }}
                 >
                     <div style={{ fontSize: 30, marginBottom: 8 }}>
-                        <Icon icon="mdi:airplane" style={{ fontSize: 30 }} />
+                        <Icon
+                            icon="ph:paper-plane-tilt-fill"
+                            width={30}
+                            height={30}
+                            color="#ffffff"
+                        />
                     </div>
                     <div style={{ fontSize: 16, fontWeight: 600 }}>
-                        写纸折纸
+                        写纸飞机
                     </div>
                 </div>
 
@@ -330,7 +335,9 @@ export default function TreePage() {
                     <div style={{ fontSize: 30, marginBottom: 8 }}>
                         <Icon
                             icon="mdi:email-outline"
-                            style={{ fontSize: 30 }}
+                            width={30}
+                            height={30}
+                            color="#ffffff"
                         />
                     </div>
                     <div

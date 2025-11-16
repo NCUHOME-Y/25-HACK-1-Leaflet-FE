@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
     Button,
     Toast,
-    Image,
     Space,
     CenterPopup,
     TextArea,
@@ -10,7 +9,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { pickAirplane, replyToAirplane } from "../../services/airplane.service";
-import airplanePickImg from "../../assets/images/airplane-pick.png";
 
 interface ComfortMessage {
     content: string;
@@ -33,12 +31,7 @@ export default function AirplanePickPage() {
         Toast.show({
             content: "正在取下纸飞机～",
             duration: 800,
-            icon: (
-                <Image
-                    src={airplanePickImg}
-                    style={{ width: "80px", height: "80px" }}
-                />
-            ),
+
         });
 
         // 0.8秒后调用获取情绪疏导接口

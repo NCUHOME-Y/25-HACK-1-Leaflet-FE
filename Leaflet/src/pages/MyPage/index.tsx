@@ -9,15 +9,13 @@ import {
 } from "antd-mobile";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import { useUser } from "../../lib/hooks/useUser";
+import { useUser } from "../../lib/hooks/useUser";      
 import avatar1 from "../../assets/images/avatar/avatar-1.png";
 import avatar2 from "../../assets/images/avatar/avatar-2.png";
 import avatar3 from "../../assets/images/avatar/avatar-3.png";
 import avatar4 from "../../assets/images/avatar/avatar-4.png";
 import avatar5 from "../../assets/images/avatar/avatar-5.png";
 import avatar6 from "../../assets/images/avatar/avatar-6.png";
-import iconArchive from "../../assets/images/icon-archive.png";
-import iconAbout from "../../assets/images/icon-about.png";
 
 export default function MyPage() {
     const navigate = useNavigate();
@@ -253,9 +251,11 @@ export default function MyPage() {
                         onClick={() => navigate("/record/history")}
                     >
                         <Space align="center">
-                            <Image
-                                src={iconArchive}
-                                style={{ width: "24px", height: "24px" }}
+                            <Icon
+                                icon="mdi:file-document-outline"
+                                width={20}
+                                height={20}
+                                style={{ color: "#00a878", marginRight: 8 }}
                             />
                             <div>
                                 <div style={{ fontWeight: "bold" }}>
@@ -281,9 +281,11 @@ export default function MyPage() {
                         onClick={() => setAboutVisible(true)}
                     >
                         <Space align="center">
-                            <Image
-                                src={iconAbout}
-                                style={{ width: "24px", height: "24px" }}
+                            <Icon
+                                icon="mdi:information-outline"
+                                width={20}
+                                height={20}
+                                style={{ color: "#00a878", marginRight: 8 }}
                             />
                             <div>
                                 <div style={{ fontWeight: "bold" }}>
