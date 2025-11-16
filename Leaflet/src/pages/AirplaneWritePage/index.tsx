@@ -64,12 +64,22 @@ export default function AirplaneWritePage() {
             });
             // 发送成功后返回心情树
             navigate("/tree", { replace: true });
-        } catch (error) {
-            // 假设后端返回 { error: "换个积极的表达吧～" }
-            Toast.show({
-                icon: "fail",
-                content: "换个积极的表达吧～",
-            });
+        } catch (error: any) {
+            // 解析审核失败等后端错误并弹出提示
+            const errData = error?.response?.data;
+            const baseMsg =
+                errData?.error || errData?.message || "发送失败，请重试";
+            const reason = errData?.reason ? `（${errData.reason}）` : "";
+            const finalMsg = `${baseMsg}${reason}`;
+
+            // 审核不通过时使用 alert 明确提示
+            if (
+                typeof baseMsg === "string" &&
+                (baseMsg.includes("未通过审核") || baseMsg.includes("审核"))
+            ) {
+                window.alert(finalMsg);
+            }
+            Toast.show({ icon: "fail", content: finalMsg });
         } finally {
             setIsSending(false);
         }
