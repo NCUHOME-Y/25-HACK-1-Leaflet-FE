@@ -128,7 +128,7 @@ npm run lint
 pnpm lint
 ```
 
-## 🔧 配置说明
+##  配置说明
 
 ### 环境配置
 项目支持通过环境变量进行配置，主要配置项：
@@ -231,7 +231,7 @@ PATCH /api/user/avatar
 Body: { avatar: string }
 ```
 
-## 🎨 设计规范
+##  设计规范
 
 ### 色彩系统
 - **主色调**: `#00a878` (温暖绿)
@@ -251,7 +251,7 @@ Body: { avatar: string }
 - **断点**: 375px (iPhone SE) - 414px (iPhone Pro)
 - **布局**: 使用 Flexbox 和 Grid 实现弹性布局
 
-## 🔐 数据存储
+##  数据存储
 
 ### 本地存储
 应用使用 localStorage 存储用户基本信息：
@@ -271,7 +271,7 @@ localStorage.setItem('myProblemIds', JSON.stringify(problemIds));
 - **异步同步**: 后台尝试同步到服务器
 - **容错处理**: 网络失败时静默处理，不影响用户体验
 
-## 🧪 测试策略
+##  测试策略
 
 ### 组件测试
 - 使用 React Testing Library 进行组件单元测试
@@ -285,68 +285,21 @@ localStorage.setItem('myProblemIds', JSON.stringify(problemIds));
 - 使用 Cypress 进行完整用户流程测试
 - 覆盖核心功能路径
 
-## 📈 性能优化
-
-### 代码检查
-
-项目使用 ESLint 进行静态检查，Prettier 用于代码格式化。下面是推荐的本地命令：
-
-```bash
-# 运行 ESLint 检查
-npm run lint
-# 或（若使用 pnpm）
-- 使用 WebP 格式图片
-
-# 自动修复可修复的问题
-npm run lint -- --fix
-pnpm run lint -- --fix
-
-# 如果仓库配置了 Prettier（package.json 中有 format 脚本）
-npm run format
-pnpm run format
-```
-
-建议提交前按顺序执行：`lint --fix` → `format` → `tsc --noEmit`（类型检查）。在 CI 中也应运行相同检查以保证代码质量。
-- 实现图片懒加载
-- 压缩静态资源
 
 ### 缓存策略
 - API 响应缓存
 - 静态资源缓存
 - 离线数据缓存
 
-## 🚀 部署指南
-
-### 构建配置
-```bash
-# 生产环境构建
-npm run build
-
-# 构建结果在 dist/ 目录
-```
-
-### 环境变量
-```bash
-# .env.production
-VITE_API_BASE_URL=https://api.leaflet.com
-VITE_APP_TITLE=Leaflet - 心情记录
-```
-
-### 部署选项
-1. **静态托管**: Vercel, Netlify, GitHub Pages
-2. **CDN部署**: 阿里云OSS, 腾讯云COS
-3. **服务器部署**: Nginx + PM2
-
-## 🤝 贡献指南
+##  贡献指南
 
 ### 开发流程
 1. Fork 项目到个人仓库
-2. 提交更改: `git commit -m 'Add amazing feature'`
-3. 推送分支: `git push origin feature/amazing-feature`
+2. 提交更改
+3. 推送分支
 4. 创建 Pull Request
 
 ### 代码规范
-- 使用 ESLint 进行代码检查
 - 遵循 TypeScript 严格模式
 - 组件使用函数式组件 + Hooks
 - 保持代码简洁和可读性
