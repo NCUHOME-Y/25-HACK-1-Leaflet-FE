@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { TextArea, Button, Toast, Image } from "antd-mobile";
+import { TextArea, Button, Toast } from "antd-mobile";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { publishAirplane } from "../../services/airplane.service";
-import airplaneFlyImg from "../../assets/images/airplane-fly.png";
 
 export default function AirplaneWritePage() {
     const navigate = useNavigate();
@@ -55,12 +54,6 @@ export default function AirplaneWritePage() {
             Toast.show({
                 content: "纸飞机已飞走～",
                 duration: 3000,
-                icon: (
-                    <Image
-                        src={airplaneFlyImg}
-                        style={{ width: "80px", height: "80px" }}
-                    />
-                ),
             });
             // 发送成功后返回心情树
             navigate("/tree", { replace: true });

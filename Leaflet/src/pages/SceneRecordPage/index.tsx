@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { Button, Toast, Image } from "antd-mobile";
+import { Button, Toast } from "antd-mobile";
 import { useNavigate, useLocation } from "react-router-dom";
 import { recordMind, getAllRecords } from "../../services/mind.service";
 import { useUser } from "../../lib/hooks/useUser";
-import airplaneFlyImg from "../../assets/images/airplane-fly.png";
 
 // 本地定义记录的接口类型
 interface MindRecord {
@@ -68,12 +67,6 @@ export default function SceneRecordPage() {
             Toast.show({
                 content: "记录已保存～",
                 duration: 1000,
-                icon: (
-                    <Image
-                        src={airplaneFlyImg}
-                        style={{ width: "60px", height: "60px" }}
-                    />
-                ),
             });
 
             // 清空输入框并重新加载记录
@@ -172,10 +165,6 @@ export default function SceneRecordPage() {
                             当前有若干人在此场景
                         </div>
                     </div>
-                    <Image
-                        src={airplaneFlyImg}
-                        style={{ width: 36, height: 36 }}
-                    />
                 </div>
 
                 <textarea
