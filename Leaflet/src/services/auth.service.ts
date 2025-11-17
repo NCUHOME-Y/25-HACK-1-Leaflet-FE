@@ -13,6 +13,8 @@ export const login = async (username: string, password: string) => {
       throw new Error('登录失败：未收到登录凭证');
     }
     localStorage.setItem('token', token);
+    // 存储用户名到 localStorage
+    localStorage.setItem('username', username);
     return res.data; // 返回数据给调用方
   } catch (error) {
     console.error('Login failed:', error);
@@ -33,6 +35,8 @@ export const register = async (username: string, password: string) => {
       throw new Error('注册失败：未收到登录凭证');
     }
     localStorage.setItem('token', token);
+    // 存储用户名到 localStorage
+    localStorage.setItem('username', username);
     return res.data; // 返回数据给调用方
   } catch (error) {
     console.error('Register failed:', error);

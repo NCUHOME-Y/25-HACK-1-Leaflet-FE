@@ -5,7 +5,6 @@ import {
     Image,
     Space,
     CenterPopup,
-    Input,
 } from "antd-mobile";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
@@ -67,14 +66,7 @@ export default function MyPage() {
 
     // 保存编辑
     const handleSaveProfile = async () => {
-        const nickname = formNickname.trim();
-        if (!nickname) {
-            Toast.show("请输入昵称");
-            return;
-        }
-
         // 使用自定义hook更新用户信息（会自动保存到localStorage）
-        updateNickname(nickname);
         updateAvatar(formAvatar || user.avatar);
         setEditVisible(false);
         Toast.show("保存中…");
@@ -82,13 +74,9 @@ export default function MyPage() {
         // 可在此调用后端接口（若后端不可用则静默失败）
         try {
             const {
-                updateNickname: updateNicknameApi,
                 updateAvatar: updateAvatarApi,
             } = await import("../../services/user.service");
-            await Promise.allSettled([
-                updateNicknameApi(nickname),
-                updateAvatarApi(formAvatar || user.avatar),
-            ]);
+            await updateAvatarApi(formAvatar || user.avatar);
             Toast.show("资料已更新");
         } catch (e) {
             // 静默处理，保留本地状态
@@ -328,15 +316,20 @@ export default function MyPage() {
                             color: "#666",
                         }}
                     >
-                        昵称
+                        用户名
                     </div>
-                    <Input
-                        value={formNickname}
-                        onChange={(val) => setFormNickname(val)}
-                        placeholder="请输入昵称"
-                        maxLength={20}
-                        style={{ marginBottom: 12 }}
-                    />
+                    <p
+                        style={{
+                            marginBottom: 12,
+                            padding: "8px 12px",
+                            background: "#f5f5f5",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            color: "#666",
+                        }}
+                    >
+                        {formNickname}
+                    </p>
 
                     <div
                         style={{
