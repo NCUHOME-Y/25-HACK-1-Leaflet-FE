@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Empty, ErrorBlock, List, SpinLoading, Toast } from "antd-mobile";
 import { Icon } from "@iconify/react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getSolve } from "../../services/airplane.service";
+import { getSolve, getProblemById } from "../../services/airplane.service";
 
 interface ReplyItem {
     id: string | number;
@@ -10,6 +10,7 @@ interface ReplyItem {
     createdAt?: string;
     problemId?: string | number;
     userId?: string | number;
+    problemContent?: string;
 }
 
 function normalizeSolveData(raw: any): ReplyItem[] {
@@ -33,20 +34,39 @@ function normalizeSolveData(raw: any): ReplyItem[] {
 
     const arr = pickArray(raw);
     return arr
-        .map((s: any, idx: number) => ({
-            id: s.ID || s.id || s.solve_id || idx,
-            solution: String(
-                s.solution ?? s.reply ?? s.answer ?? s.content ?? ""
-            ),
-            createdAt:
-                s.CreatedAt ||
-                s.created_at ||
-                s.createdAt ||
-                s.time ||
-                s.timestamp,
-            problemId: s.problem_id || s.problemId || s.pid || s.problemID,
-            userId: s.user_id || s.userId || s.uid,
-        }))
+        .map((s: any, idx: number) => {
+            const problemId =
+                s.problem_id || s.problemId || s.pid || s.problemID;
+            // 仅从明确字段读取解决方案，避免把问题内容误判为回复
+            const solution =
+                s.solution ?? s.reply ?? s.answer ?? s.solver_content;
+            // 尽量提取问题内容：优先嵌套对象，其次通用字段
+            const problemContent =
+                s.problem?.content ||
+                s.problem?.context ||
+                s.problem_content ||
+                s.problemContext ||
+                s.title ||
+                s.context || // 有些接口直接把问题文本放在 context/content
+                s.content ||
+                undefined;
+
+            return {
+                id: s.ID || s.id || s.solve_id || idx,
+                solution: solution ? String(solution) : "",
+                createdAt:
+                    s.CreatedAt ||
+                    s.created_at ||
+                    s.createdAt ||
+                    s.time ||
+                    s.timestamp,
+                problemId,
+                userId: s.user_id || s.userId || s.uid,
+                problemContent: problemContent
+                    ? String(problemContent)
+                    : undefined,
+            } as ReplyItem;
+        })
         .filter((r: ReplyItem) => r.solution !== "");
 }
 
@@ -79,7 +99,7 @@ export default function SolveReplyPage() {
         }
         // 请求仅返回“与我有关”的回信（需要后端支持 ?mine=1）
         getSolve({ mine: 1 })
-            .then((res) => {
+            .then(async (res) => {
                 const data = res?.data ?? res;
                 let items = normalizeSolveData(data);
                 // 前端兜底：若后端未按 mine 过滤，则按本地记录的我的问题ID过滤
@@ -91,16 +111,72 @@ export default function SolveReplyPage() {
                             myIds.includes(String(it.problemId))
                     );
                 }
-                const injected = location.state?.injected
+                const injected: ReplyItem[] = location.state?.injected
                     ? [
                           {
                               id: `injected-${Date.now()}`,
-                              solution: location.state.injected.solution || "",
+                              solution: String(
+                                  location.state.injected.solution || ""
+                              ),
                               createdAt: location.state.injected.createdAt,
+                              problemId: undefined,
+                              userId: undefined,
+                              problemContent: undefined,
                           },
                       ]
                     : [];
-                setList([...items, ...injected]);
+                let next: ReplyItem[] = [...items, ...injected];
+                // 若缺少问题内容，尝试按 problemId 拉取补全
+                const missingIds = Array.from(
+                    new Set(
+                        next
+                            .filter((x) => x.problemId && !x.problemContent)
+                            .map((x) => String(x.problemId))
+                    )
+                );
+                if (missingIds.length) {
+                    try {
+                        const results = await Promise.all(
+                            missingIds.map((pid) =>
+                                getProblemById(pid).then((r) => ({
+                                    pid,
+                                    data: r?.data,
+                                }))
+                            )
+                        );
+                        const contentMap = new Map<string, string>();
+                        for (const { pid, data: d } of results) {
+                            // 后端 /problems 可能返回数组或单项
+                            const rec = Array.isArray(d) ? d[0] : d;
+                            const text =
+                                rec?.content ||
+                                rec?.context ||
+                                rec?.problem?.content ||
+                                rec?.problem?.context ||
+                                rec?.data?.content ||
+                                rec?.data?.context ||
+                                "";
+                            if (text) contentMap.set(pid, String(text));
+                        }
+                        if (contentMap.size) {
+                            next = next.map((x) =>
+                                x.problemId &&
+                                !x.problemContent &&
+                                contentMap.has(String(x.problemId))
+                                    ? {
+                                          ...x,
+                                          problemContent: contentMap.get(
+                                              String(x.problemId)
+                                          ),
+                                      }
+                                    : x
+                            );
+                        }
+                    } catch (e) {
+                        console.warn("获取问题内容失败（忽略并继续）", e);
+                    }
+                }
+                setList(next);
             })
             .catch((err) => {
                 console.error("❌ 刷新失败", err);
@@ -174,6 +250,35 @@ export default function SolveReplyPage() {
                                     boxShadow: "0 2px 8px rgba(0,168,120,0.08)",
                                 }}
                             >
+                                {item.problemContent && (
+                                    <div
+                                        style={{
+                                            marginBottom: 8,
+                                            background: "#f8fcfa",
+                                            border: "1px solid #d8f3dc",
+                                            borderRadius: 8,
+                                            padding: 10,
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                fontSize: 12,
+                                                color: "#6aa893",
+                                                marginBottom: 4,
+                                            }}
+                                        >
+                                            问题
+                                        </div>
+                                        <div
+                                            style={{
+                                                whiteSpace: "pre-wrap",
+                                                color: "#2b2b2b",
+                                            }}
+                                        >
+                                            {item.problemContent}
+                                        </div>
+                                    </div>
+                                )}
                                 <div
                                     style={{
                                         fontSize: 12,

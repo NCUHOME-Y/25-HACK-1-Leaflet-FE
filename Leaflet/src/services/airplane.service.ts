@@ -68,3 +68,10 @@ export const getDailyLimit = () => {
 export const replyToAirplane = (id: number, solution: string) => {
     return apiClient.post(`/solve/${id}`, { solution });
 };
+
+// 通过问题ID获取原问题内容（若后端支持 /mind/:id）
+// 使用 /problems 接口获取问题数据（后端返回可能是数组或单项）
+// 通过问题ID获取原问题内容（后端提供 GET /mind/:id）
+export const getProblemById = (id: number | string) => {
+    return apiClient.get(`/mind/${id}`);
+};

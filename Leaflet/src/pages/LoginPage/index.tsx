@@ -44,11 +44,33 @@ export default function LoginPage() {
         setLoading(true);
         try {
             await register(id, password);
-            message.success("注册成功！");
-            // 直接跳转，删除延时
+            // 确保有登录态：若注册未返回 token，则自动登录一次
+            const hasToken = !!localStorage.getItem("token");
+            if (!hasToken) {
+                await login(id, password);
+            }
             navigate("/record", { replace: true });
-        } catch {
-            message.error("注册失败，请重试");
+        } catch (e: any) {
+            const status = e?.response?.status;
+            const msg = e?.response?.data?.message || e?.message;
+            // 用户名已存在：给出 alert 明确提示，并终止兜底登录
+            if (
+                status === 409 &&
+                typeof msg === "string" &&
+                msg.includes("用户名已存在")
+            ) {
+                window.alert("用户名已存在，请更换一个用户ID再试");
+                message.warning("用户名已存在");
+                return;
+            }
+            // 其它情况：注册失败时尝试直接登录（有些后端注册成功但不返回 token）
+            try {
+                await login(id, password);
+                navigate("/record", { replace: true });
+                return;
+            } catch (e2: any) {
+                message.error(e2?.message || msg || "注册失败，请重试");
+            }
         } finally {
             setLoading(false);
         }
