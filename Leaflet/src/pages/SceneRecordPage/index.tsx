@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Toast } from "antd-mobile";
+import { Button } from "antd-mobile";
 import { useNavigate, useLocation } from "react-router-dom";
 import { recordMind, getAllRecords } from "../../services/mind.service";
 import { useUser } from "../../lib/hooks/useUser";
@@ -18,6 +18,7 @@ export default function SceneRecordPage() {
     const [content, setContent] = useState("");
     const [records, setRecords] = useState<MindRecord[]>([]);
     const [loading, setLoading] = useState(false);
+    const [showSuccessMsg, setShowSuccessMsg] = useState(false);
 
     // 从路由状态获取场景信息
     const scene = location.state?.scene || "";
@@ -47,11 +48,9 @@ export default function SceneRecordPage() {
 
     const handlePublish = async () => {
         if (!content.trim()) {
-            Toast.show("请输入内容");
             return;
         }
         if (content.length > 200) {
-            Toast.show("字数不能超过200字");
             return;
         }
 
@@ -63,23 +62,25 @@ export default function SceneRecordPage() {
                 content: content.trim(),
             });
 
-            // 显示成功提示
-            Toast.show({
-                content: "记录已保存～",
-                duration: 1000,
-            });
-
             // 清空输入框并重新加载记录
             setContent("");
             loadAllRecords();
 
-            // 删除延时跳转，保留当前页面供继续记录；用户可手动返回
+            // 显示成功提示
+            setShowSuccessMsg(true);
         } catch (error) {
             console.error("保存记录失败:", error);
-            Toast.show("保存失败，请重试");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleContinueHere = () => {
+        setShowSuccessMsg(false);
+    };
+
+    const handleGoBack = () => {
+        navigate("/record");
     };
 
     const handleBack = () => {
@@ -94,6 +95,100 @@ export default function SceneRecordPage() {
                 padding: "20px",
             }}
         >
+            {/* 成功提示 */}
+            {showSuccessMsg && (
+                <>
+                    <div
+                        style={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: "rgba(0,0,0,0.4)",
+                            zIndex: 9998,
+                        }}
+                    />
+                    {/* 提示卡片 */}
+                    <div
+                        style={{
+                            position: "fixed",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            background: "#fff",
+                            padding: "32px 28px 28px",
+                            borderRadius: "20px",
+                            boxShadow: "0 12px 48px rgba(0,0,0,0.2)",
+                            zIndex: 9999,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "20px",
+                            maxWidth: "320px",
+                            width: "85%",
+                        }}
+                    >
+                        <div style={{ fontSize: "56px" }}>🌱</div>
+                        <div style={{ 
+                            fontSize: "18px", 
+                            color: "#1a7f5a", 
+                            fontWeight: 600,
+                            textAlign: "center",
+                            lineHeight: "1.5"
+                        }}>
+                            你的心情已被记录下来啦～
+                        </div>
+                        <div style={{ 
+                            fontSize: "13px", 
+                            color: "#6aa893",
+                            textAlign: "center",
+                            lineHeight: "1.6"
+                        }}>
+                            每一次记录，都是在滋养内心的小香樟呢喵
+                        </div>
+                        
+                        {/* 按钮组 */}
+                        <div style={{ 
+                            display: "flex", 
+                            flexDirection: "column",
+                            gap: "12px",
+                            width: "100%",
+                            marginTop: "8px"
+                        }}>
+                            <Button
+                                color="primary"
+                                block
+                                onClick={handleContinueHere}
+                                style={{
+                                    borderRadius: "12px",
+                                    height: "46px",
+                                    fontSize: "15px",
+                                    fontWeight: 600
+                                }}
+                            >
+                                继续写写这里的感受 ✨
+                            </Button>
+                            <Button
+                                block
+                                onClick={handleGoBack}
+                                style={{
+                                    borderRadius: "12px",
+                                    height: "46px",
+                                    fontSize: "15px",
+                                    background: "linear-gradient(135deg, #a8e6cf 0%, #dcedc8 100%)",
+                                    color: "#2d6a4f",
+                                    border: "none",
+                                    fontWeight: 500
+                                }}
+                            >
+                                去记录其他心情 🌈
+                            </Button>
+                        </div>
+                    </div>
+                </>
+            )}
+
             {/* 头部 */}
             <div
                 style={{

@@ -303,8 +303,9 @@ export default function RecordPage() {
     return (
         <div
             style={{
-                minHeight: "100vh",
+                height: "calc(100vh - 60px)",
                 background: "linear-gradient(180deg, #edfff5 0%, #f6fffb 100%)",
+                overflowY: "auto",
                 padding: "12px 16px",
                 boxSizing: "border-box",
             }}
@@ -316,7 +317,7 @@ export default function RecordPage() {
                 </div>
             </div>
 
-            <div style={{ maxWidth: 760, margin: "0 auto" }}>
+            <div style={{ maxWidth: 760, margin: "0 auto", paddingBottom: 20 }}>
                 {loading ? (
                     <div style={{ textAlign: "center", padding: 40 }}>
                         加载中…
