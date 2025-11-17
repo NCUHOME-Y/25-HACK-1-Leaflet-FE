@@ -274,8 +274,9 @@ export default function AirplanePickPage() {
     return (
         <div
             style={{
-                minHeight: "100vh",
+                height: "calc(100vh - 60px)",
                 background: "linear-gradient(180deg, #e8f5f0 0%, #f0faf6 100%)",
+                overflowY: "auto",
                 padding: "20px",
                 boxSizing: "border-box",
             }}
