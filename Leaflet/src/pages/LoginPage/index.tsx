@@ -53,14 +53,14 @@ export default function LoginPage() {
         } catch (e: any) {
             const status = e?.response?.status;
             const msg = e?.response?.data?.message || e?.message;
-            // 用户名已存在：给出 alert 明确提示，并终止兜底登录
+            // ID已存在：给出 alert 明确提示，并终止兜底登录
             if (
                 status === 409 &&
                 typeof msg === "string" &&
                 msg.includes("用户名已存在")
             ) {
-                window.alert("用户名已存在，请更换一个用户ID再试");
-                message.warning("用户名已存在");
+                window.alert("ID已存在，请更换一个ID再试");
+                message.warning("ID已存在");
                 return;
             }
             // 其它情况：注册失败时尝试直接登录（有些后端注册成功但不返回 token）
@@ -81,7 +81,7 @@ export default function LoginPage() {
             <h2>🌿 Leaflet 登录</h2>
             <p>输入用户名和密码注册后即可登录</p>
             <Input
-                placeholder="请输入ID"
+                placeholder="请输入用户名"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
                 style={{ width: "200px", margin: "16px" }}
