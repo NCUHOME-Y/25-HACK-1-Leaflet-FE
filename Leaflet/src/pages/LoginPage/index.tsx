@@ -104,6 +104,7 @@ export default function LoginPage() {
                     注册
                 </Button>
             </Space>
+            <p>忘记密码？请联系管理员进行修改</p>
         </div>
     );
 }
