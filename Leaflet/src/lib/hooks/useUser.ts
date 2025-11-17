@@ -24,16 +24,26 @@ const getUserFromStorage = (): User => {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-            return JSON.parse(stored);
+            const user = JSON.parse(stored);
+            // 从 localStorage 读取登录时保存的用户名
+            const username = localStorage.getItem('username');
+            if (username && user.nickname === "NCU心情小伙伴") {
+                // 如果有登录用户名且当前是默认昵称，则使用用户名
+                user.nickname = username;
+            }
+            return user;
         }
     } catch (error) {
         console.error("Failed to parse user from localStorage:", error);
     }
 
+    // 尝试从 localStorage 获取用户名
+    const username = localStorage.getItem('username');
+    
     // 默认用户信息
     const defaultUser: User = {
         id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        nickname: "NCU心情小伙伴",
+        nickname: username || "NCU心情小伙伴",
         avatar: avatar1,
         school: "南昌大学",
         stats: {
