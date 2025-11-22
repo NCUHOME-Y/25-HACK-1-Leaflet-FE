@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button } from "antd-mobile";
 import { useNavigate, useLocation } from "react-router-dom";
 import { recordMind, getAllRecords } from "../../services/mind.service";
-import { useUser } from "../../lib/hooks/useUser";
 
 // 本地定义记录的接口类型
 interface MindRecord {
@@ -14,7 +13,6 @@ interface MindRecord {
 export default function SceneRecordPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useUser();
     const [content, setContent] = useState("");
     const [records, setRecords] = useState<MindRecord[]>([]);
     const [loading, setLoading] = useState(false);
