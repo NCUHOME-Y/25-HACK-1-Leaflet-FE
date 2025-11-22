@@ -78,95 +78,39 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <style>{`
-        .login-page-hero{width:100%;max-width:430px;margin:0 auto;padding:60px 20px;box-sizing:border-box;text-align:center;border-radius:0;}
-        .login-form{width:100%;max-width:420px;margin:0 auto;padding:24px;box-sizing:border-box;text-align:center}
-        .login-input{width:100%}
-        .login-buttons{margin-top:48px}
-        /* make buttons sit side-by-side on desktop and stacked on mobile */
-        .login-buttons{display:flex;gap:12px;justify-content:center}
-        .login-buttons .ant-btn{width:48%;min-width:120px}
-        @media (max-width:480px){
-          .login-page-hero{padding:32px 12px}
-          .login-page-hero img{width:96px;height:96px}
-          .login-page-hero h1{font-size:20px;margin:8px 0}
-          .login-page-hero h2{font-size:14px;margin:0}
-          .login-form{padding:16px;padding-bottom:120px}
-          .login-input{width:100%}
-          .login-buttons{margin-top:24px;flex-direction:column}
-          .login-buttons .ant-btn{width:100%;min-width:0}
-          /* ensure buttons are always reachable on small screens: sticky to bottom */
-          .login-buttons.sticky-mobile{position:fixed;left:50%;transform:translateX(-50%);bottom:env(safe-area-inset-bottom,12px);width:calc(100% - 24px);max-width:420px;padding:10px 12px;z-index:9999;background:rgba(255,255,255,0.92);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12)}
-          .login-buttons.sticky-mobile .ant-btn{width:48%;min-width:0}
-          .login-buttons.sticky-mobile .ant-btn:first-child{margin-right:8px}
-        }
-      `}</style>
-
-      <div
-        className="login-page-hero"
-        style={{
-          padding: "60px 20px",
-          textAlign: "center",
-          background: "rgba(197, 227, 220, 1)",
-        }}
-      >
-        <img
-          src={icon}
-          alt="Leaflet icon"
-          style={{
-            width: 135,
-            height: 135,
-            border: "2px solid rgba(0,0,0,0.12)",
-            borderRadius: 12,
-            padding: 8,
-            background: "#fff",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
-          }}
-        />
-        <h1>一页倾心</h1>
-        <h2>Leaflet</h2>
-      </div>
-
-      <div
-        className="login-form"
-        style={{
-          padding: "24px",
-          textAlign: "center",
-          background: "rgba(255, 255, 255, 1)",
-        }}
-      >
-        <Input
-          className="login-input"
-          placeholder="请输入用户名"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          style={{ maxWidth: 350, height: "50px", margin: "12px 0" }}
-          onPressEnter={handleLogin}
-        />
-        <br />
-        <Input.Password
-          className="login-input"
-          placeholder="请输入密码"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ maxWidth: 350, height: 50, margin: "12px 0" }}
-          onPressEnter={handleLogin}
-        />
-        <br />
-        <Space
-          className="login-buttons sticky-mobile"
-          style={{ marginTop: 48 }}
-        >
-          <Button type="primary" loading={loading} onClick={handleLogin}>
-            登录
-          </Button>
-          <Button loading={loading} onClick={handleRegister}>
-            注册
-          </Button>
-        </Space>
-        <p>忘记密码？请联系管理员进行修改</p>
-      </div>
-    </>
+    <div style={{ padding: "40px", textAlign: "center" }}>
+      <img
+        src={icon}
+        style={{ width: "80px", height: "80px" }}
+        alt="Leaflet icon"
+      />
+      <h1>一页倾心</h1>
+      <p>输入用户名和密码注册后即可登录</p>
+      <Input
+        placeholder="请输入用户名"
+        value={id}
+        onChange={(e) => setId(e.target.value)}
+        style={{ width: "200px", margin: "16px" }}
+        onPressEnter={handleLogin}
+      />
+      <br />
+      <Input.Password
+        placeholder="请输入密码"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        style={{ width: "200px", margin: "8px" }}
+        onPressEnter={handleLogin}
+      />
+      <br />
+      <Space>
+        <Button type="primary" loading={loading} onClick={handleLogin}>
+          登录
+        </Button>
+        <Button loading={loading} onClick={handleRegister}>
+          注册
+        </Button>
+      </Space>
+      <p>忘记密码？请联系管理员进行修改</p>
+    </div>
   );
 }
