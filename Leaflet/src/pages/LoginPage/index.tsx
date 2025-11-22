@@ -78,39 +78,64 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: "40px", textAlign: "center" }}>
-      <img
-        src={icon}
-        style={{ width: "80px", height: "80px" }}
-        alt="Leaflet icon"
-      />
-      <h1>一页倾心</h1>
-      <p>输入用户名和密码注册后即可登录</p>
-      <Input
-        placeholder="请输入用户名"
-        value={id}
-        onChange={(e) => setId(e.target.value)}
-        style={{ width: "200px", margin: "16px" }}
-        onPressEnter={handleLogin}
-      />
-      <br />
-      <Input.Password
-        placeholder="请输入密码"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ width: "200px", margin: "8px" }}
-        onPressEnter={handleLogin}
-      />
-      <br />
-      <Space>
-        <Button type="primary" loading={loading} onClick={handleLogin}>
-          登录
-        </Button>
-        <Button loading={loading} onClick={handleRegister}>
-          注册
-        </Button>
-      </Space>
-      <p>忘记密码？请联系管理员进行修改</p>
-    </div>
+    <>
+      <div
+        style={{
+          padding: "90px",
+          textAlign: "center",
+          background: "rgba(197, 227, 220, 1)",
+        }}
+      >
+        <img
+          src={icon}
+          alt="Leaflet icon"
+          style={{
+            width: 135,
+            height: 135,
+            border: "2px solid rgba(0,0,0,0.12)",
+            borderRadius: 12,
+            padding: 8,
+            background: "#fff",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+          }}
+        />
+        <h1>一页倾心</h1>
+        <h2>Leaflet</h2>
+      </div>
+
+      <div
+        style={{
+          padding: "40px",
+          textAlign: "center",
+          background: "rgba(255, 255, 255, 1)",
+        }}
+      >
+        <Input
+          placeholder="请输入用户名"
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+          style={{ width: "350px", height: "50px", margin: "25px" }}
+          onPressEnter={handleLogin}
+        />
+        <br />
+        <Input.Password
+          placeholder="请输入密码"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ width: 350, height: 50, margin: 25 }}
+          onPressEnter={handleLogin}
+        />
+        <br />
+        <Space>
+          <Button type="primary" loading={loading} onClick={handleLogin}>
+            登录
+          </Button>
+          <Button loading={loading} onClick={handleRegister}>
+            注册
+          </Button>
+        </Space>
+        <p>忘记密码？请联系管理员进行修改</p>
+      </div>
+    </>
   );
 }
