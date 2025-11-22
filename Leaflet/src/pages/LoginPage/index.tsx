@@ -81,7 +81,7 @@ export default function LoginPage() {
     <>
       <div
         style={{
-          padding: "90px",
+          padding: "60px 20px",
           textAlign: "center",
           background: "rgba(197, 227, 220, 1)",
         }}
@@ -105,7 +105,7 @@ export default function LoginPage() {
 
       <div
         style={{
-          padding: "40px",
+          padding: "24px",
           textAlign: "center",
           background: "rgba(255, 255, 255, 1)",
         }}
@@ -114,7 +114,7 @@ export default function LoginPage() {
           placeholder="请输入用户名"
           value={id}
           onChange={(e) => setId(e.target.value)}
-          style={{ width: "350px", height: "50px", margin: "25px" }}
+          style={{ width: "350px", height: "50px", margin: "12px 0" }}
           onPressEnter={handleLogin}
         />
         <br />
@@ -122,11 +122,11 @@ export default function LoginPage() {
           placeholder="请输入密码"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ width: 350, height: 50, margin: 25 }}
+          style={{ width: 350, height: 50, margin: "12px 0" }}
           onPressEnter={handleLogin}
         />
         <br />
-        <Space>
+        <Space style={{ marginTop: 48 }}>
           <Button type="primary" loading={loading} onClick={handleLogin}>
             登录
           </Button>

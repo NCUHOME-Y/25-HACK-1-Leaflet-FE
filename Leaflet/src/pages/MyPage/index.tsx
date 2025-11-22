@@ -15,11 +15,7 @@ export default function MyPage() {
   const navigate = useNavigate();
 
   // 使用自定义hook管理用户状态
-<<<<<<< HEAD
   const { user, loading, updateAvatar } = useUser();
-=======
-  const { user, loading, updateNickname, updateAvatar } = useUser();
->>>>>>> 0915ef5 (fix:图标)
 
   // 编辑弹窗状态
   const [editVisible, setEditVisible] = useState(false);
