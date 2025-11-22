@@ -33,7 +33,20 @@ export const recordMind = (data: MindRecordPayload) => {
     content: data.content
   };
 
-  return apiClient.post('/status', payload);
+  return apiClient
+    .post('/status', payload)
+    .then((res) => {
+      console.log('✅ POST /status 成功');
+      console.log('📥 响应数据:', res.data);
+      return res;
+    })
+    .catch((err) => {
+      console.error('❌ POST /status 失败');
+      console.error('状态码:', err.response?.status);
+      console.error('错误详情:', err.response?.data);
+      console.error('完整错误:', err);
+      return Promise.reject(err);
+    });
 };
 
 // 获取特定场景的记录
