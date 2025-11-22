@@ -47,13 +47,6 @@ export const recordMind = (data: MindRecordPayload) => {
     content: data.content
   };
 
-  // 打印详细的调试信息
-  console.log('==================== POST /status ====================');
-  console.log('📤 请求参数:', JSON.stringify(payload, null, 2));
-  console.log('tag_id 类型:', typeof payload.tag_id);
-  console.log('content 类型:', typeof payload.content);
-  console.log('=====================================================');
-
   return apiClient
     .post('/status', payload)
     .then((res) => {
