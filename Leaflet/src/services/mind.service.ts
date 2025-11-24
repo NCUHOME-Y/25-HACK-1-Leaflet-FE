@@ -23,21 +23,7 @@ export interface UserLevel {
 
 // 获取用户等级信息
 export const getUserLevel = () => {
-  console.log('==================== GET /status/level ====================');
-  
-  return apiClient.get('/status/level')
-    .then((res) => {
-      console.log('✅ GET /status/level 成功');
-      console.log('📥 响应数据:', res.data);
-      return res;
-    })
-    .catch((err) => {
-      console.error('❌ GET /status/level 失败');
-      console.error('状态码:', err.response?.status);
-      console.error('错误详情:', err.response?.data);
-      console.error('完整错误:', err);
-      return Promise.reject(err);
-    });
+  return apiClient.get('/status/level');
 };
 
 // 记录心情 - 只发送 tag_id 和 content
@@ -76,45 +62,12 @@ export const getAllRecords = () => {
 
 // 删除心情记录
 export const deleteRecord = (id: number | string) => {
-  console.log('==================== DELETE /status/:id ====================');
-  console.log(`🗑️ 删除记录 ID: ${id}`);
-  console.log('ID 类型:', typeof id);
-  console.log('请求URL:', `/status/${id}`);
-  
-  return apiClient.delete(`/status/${id}`)
-    .then((res) => {
-      console.log('✅ DELETE /status/:id 成功');
-      console.log('📥 响应数据:', res.data);
-      return res;
-    })
-    .catch((err) => {
-      console.error('❌ DELETE /status/:id 失败');
-      console.error('状态码:', err.response?.status);
-      console.error('错误详情:', err.response?.data);
-      console.error('完整错误:', err);
-      return Promise.reject(err);
-    });
+  return apiClient.delete(`/status/${id}`);
 };
 
 // 编辑心情记录
 export const updateRecord = (id: number | string, data: { tag_id: number; content: string }) => {
-  console.log('==================== PUT /status/:id ====================');
-  console.log(`✏️ 编辑记录 ID: ${id}`);
-  console.log('📤 请求参数:', JSON.stringify(data, null, 2));
-  
-  return apiClient.put(`/status/${id}`, data)
-    .then((res) => {
-      console.log('✅ PUT /status/:id 成功');
-      console.log('📥 响应数据:', res.data);
-      return res;
-    })
-    .catch((err) => {
-      console.error('❌ PUT /status/:id 失败');
-      console.error('状态码:', err.response?.status);
-      console.error('错误详情:', err.response?.data);
-      console.error('完整错误:', err);
-      return Promise.reject(err);
-    });
+  return apiClient.put(`/status/${id}`, data);
 };
 
 // 场景相关的统计与上报在单独的 scene.service.ts 中实现，保持向后兼容的同时便于职责分离
