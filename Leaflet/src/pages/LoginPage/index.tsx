@@ -79,7 +79,28 @@ export default function LoginPage() {
 
   return (
     <>
+      <style>{`
+        .login-page-hero{width:100%;max-width:430px;margin:0 auto;padding:60px 20px;box-sizing:border-box;text-align:center;border-radius:0;}
+        .login-form{width:100%;max-width:420px;margin:0 auto;padding:24px;box-sizing:border-box;text-align:center}
+        .login-input{width:100%}
+        .login-buttons{margin-top:48px}
+        /* make buttons sit side-by-side on desktop and stacked on mobile */
+        .login-buttons{display:flex;gap:12px;justify-content:center}
+        .login-buttons .ant-btn{width:48%;min-width:120px}
+        @media (max-width:480px){
+          .login-page-hero{padding:32px 12px}
+          .login-page-hero img{width:96px;height:96px}
+          .login-page-hero h1{font-size:20px;margin:8px 0}
+          .login-page-hero h2{font-size:14px;margin:0}
+          .login-form{padding:16px}
+          .login-input{width:100%}
+          .login-buttons{margin-top:24px;flex-direction:column}
+          .login-buttons .ant-btn{width:100%;min-width:0}
+        }
+      `}</style>
+
       <div
+        className="login-page-hero"
         style={{
           padding: "60px 20px",
           textAlign: "center",
@@ -104,6 +125,7 @@ export default function LoginPage() {
       </div>
 
       <div
+        className="login-form"
         style={{
           padding: "24px",
           textAlign: "center",
@@ -111,22 +133,24 @@ export default function LoginPage() {
         }}
       >
         <Input
+          className="login-input"
           placeholder="请输入用户名"
           value={id}
           onChange={(e) => setId(e.target.value)}
-          style={{ width: "350px", height: "50px", margin: "12px 0" }}
+          style={{ maxWidth: 350, height: "50px", margin: "12px 0" }}
           onPressEnter={handleLogin}
         />
         <br />
         <Input.Password
+          className="login-input"
           placeholder="请输入密码"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ width: 350, height: 50, margin: "12px 0" }}
+          style={{ maxWidth: 350, height: 50, margin: "12px 0" }}
           onPressEnter={handleLogin}
         />
         <br />
-        <Space style={{ marginTop: 48 }}>
+        <Space className="login-buttons" style={{ marginTop: 48 }}>
           <Button type="primary" loading={loading} onClick={handleLogin}>
             登录
           </Button>
