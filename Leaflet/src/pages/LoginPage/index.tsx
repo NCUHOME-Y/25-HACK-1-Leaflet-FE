@@ -92,10 +92,14 @@ export default function LoginPage() {
           .login-page-hero img{width:96px;height:96px}
           .login-page-hero h1{font-size:20px;margin:8px 0}
           .login-page-hero h2{font-size:14px;margin:0}
-          .login-form{padding:16px}
+          .login-form{padding:16px;padding-bottom:120px}
           .login-input{width:100%}
           .login-buttons{margin-top:24px;flex-direction:column}
           .login-buttons .ant-btn{width:100%;min-width:0}
+          /* ensure buttons are always reachable on small screens: sticky to bottom */
+          .login-buttons.sticky-mobile{position:fixed;left:50%;transform:translateX(-50%);bottom:env(safe-area-inset-bottom,12px);width:calc(100% - 24px);max-width:420px;padding:10px 12px;z-index:9999;background:rgba(255,255,255,0.92);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12)}
+          .login-buttons.sticky-mobile .ant-btn{width:48%;min-width:0}
+          .login-buttons.sticky-mobile .ant-btn:first-child{margin-right:8px}
         }
       `}</style>
 
@@ -150,7 +154,10 @@ export default function LoginPage() {
           onPressEnter={handleLogin}
         />
         <br />
-        <Space className="login-buttons" style={{ marginTop: 48 }}>
+        <Space
+          className="login-buttons sticky-mobile"
+          style={{ marginTop: 48 }}
+        >
           <Button type="primary" loading={loading} onClick={handleLogin}>
             登录
           </Button>

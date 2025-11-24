@@ -90,7 +90,7 @@ export default function TreePage() {
         flexDirection: "column",
         alignItems: "center",
         position: "relative",
-        overflow: "hidden",
+        overflow: "auto",
         background:
           "linear-gradient(180deg, rgba(191, 207, 185, 0.67) 0%, rgba(247, 249, 246, 0.67) 100%)",
       }}
@@ -147,7 +147,8 @@ export default function TreePage() {
         <div
           style={{
             marginBottom: 20,
-            height: 450,
+            height: 300,
+            maxHeight: 450,
             position: "relative",
             display: "flex",
             justifyContent: "center",
