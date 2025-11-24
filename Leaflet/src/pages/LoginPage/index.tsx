@@ -18,7 +18,6 @@ export default function LoginPage() {
     try {
       await login(id, password);
       message.success("登录成功！");
-      // 直接跳转，删除延时
       const from = (location.state as any)?.from?.pathname || "/record";
       navigate(from, { replace: true });
     } catch {
@@ -38,7 +37,6 @@ export default function LoginPage() {
       );
     }
   };
-
   const handleRegister = async () => {
     if (!id.trim() || !password)
       return message.warning("请输入你的用户ID和密码");
@@ -80,26 +78,23 @@ export default function LoginPage() {
   return (
     <>
       <style>{`
-        .login-page-hero{width:100%;max-width:430px;margin:0 auto;padding:60px 20px;box-sizing:border-box;text-align:center;border-radius:0;}
-        .login-form{width:100%;max-width:420px;margin:0 auto;padding:24px;box-sizing:border-box;text-align:center}
+        .login-page-hero{width:100%;max-width:520px;margin:0 auto;padding:60px 20px;box-sizing:border-box;text-align:center;border-radius:0;}
+        .login-form{width:100%;max-width:520px;margin:0 auto;padding:24px;box-sizing:border-box;text-align:center}
         .login-input{width:100%}
         .login-buttons{margin-top:48px}
         /* make buttons sit side-by-side on desktop and stacked on mobile */
-        .login-buttons{display:flex;gap:12px;justify-content:center}
-        .login-buttons .ant-btn{width:48%;min-width:120px}
+        .login-buttons{display:flex;gap:16px;justify-content:center;align-items:center;width:100%;max-width:520px;margin:0 auto}
+        .login-buttons .ant-btn{flex:1;max-width:320px;min-width:220px;border-radius:10px;height:52px;font-weight:600;transition:transform .12s ease,box-shadow .12s ease}
         @media (max-width:480px){
           .login-page-hero{padding:32px 12px}
           .login-page-hero img{width:96px;height:96px}
           .login-page-hero h1{font-size:20px;margin:8px 0}
           .login-page-hero h2{font-size:14px;margin:0}
-          .login-form{padding:16px;padding-bottom:120px}
+          .login-form{padding:16px;padding-bottom:140px}
           .login-input{width:100%}
           .login-buttons{margin-top:24px;flex-direction:column}
-          .login-buttons .ant-btn{width:100%;min-width:0}
-          /* ensure buttons are always reachable on small screens: sticky to bottom */
-          .login-buttons.sticky-mobile{position:fixed;left:50%;transform:translateX(-50%);bottom:env(safe-area-inset-bottom,12px);width:calc(100% - 24px);max-width:420px;padding:10px 12px;z-index:9999;background:rgba(255,255,255,0.92);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12)}
-          .login-buttons.sticky-mobile .ant-btn{width:48%;min-width:0}
-          .login-buttons.sticky-mobile .ant-btn:first-child{margin-right:8px}
+          .login-buttons .ant-btn{width:100%;min-width:0;max-width:none}
+          /* small-screen stacking (buttons remain in document flow, above the 'forgot' text) */
         }
       `}</style>
 
@@ -141,7 +136,7 @@ export default function LoginPage() {
           placeholder="请输入用户名"
           value={id}
           onChange={(e) => setId(e.target.value)}
-          style={{ maxWidth: 350, height: "50px", margin: "12px 0" }}
+          style={{ maxWidth: 460, height: "50px", margin: "12px 0" }}
           onPressEnter={handleLogin}
         />
         <br />
@@ -150,18 +145,23 @@ export default function LoginPage() {
           placeholder="请输入密码"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ maxWidth: 350, height: 50, margin: "12px 0" }}
+          style={{ maxWidth: 460, height: 50, margin: "12px 0" }}
           onPressEnter={handleLogin}
         />
         <br />
-        <Space
-          className="login-buttons sticky-mobile"
-          style={{ marginTop: 48 }}
-        >
-          <Button type="primary" loading={loading} onClick={handleLogin}>
+        <Space className="login-buttons" style={{ marginTop: 48 }}>
+          <Button
+            className="btn-primary"
+            loading={loading}
+            onClick={handleLogin}
+          >
             登录
           </Button>
-          <Button loading={loading} onClick={handleRegister}>
+          <Button
+            className="btn-secondary"
+            loading={loading}
+            onClick={handleRegister}
+          >
             注册
           </Button>
         </Space>
