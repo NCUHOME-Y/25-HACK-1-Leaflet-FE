@@ -157,7 +157,7 @@ export default function EncouragementPage() {
 
         <Button
           color="default"
-          size="large"
+          size="large" 
           fill="outline"
           onClick={() => navigate("/solve-replies")}
           style={{
